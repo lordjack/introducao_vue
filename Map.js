@@ -17,7 +17,6 @@ new Vue({
 
                 let firstDraw = true
                 let prevZoom
-                debugger
 
                 let pixiOverlay = L.pixiOverlay(utils => {
                     let zoom = utils.getMap().getZoom()
