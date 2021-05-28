@@ -2,10 +2,12 @@
   <div class="hello">
     <h1> Olá {{ msg }}</h1>
     <div id='app'>
-      <div ref='map' style='height: 300px'></div> 
+       <div ref='map' style='height: 300px'></div> 
     </div>
-   <!-- <div style="height: 500px; width: 100%">
+  
+    <div style="height: 500px; width: 100%">
         <div style="height: 200px; overflow: auto;">
+          <h1> teste1 <!-- {{  pOverlay */ }} --></h1>
         <p>Marcação lugar no Mapa {{ withPopup.lat }}, {{ withPopup.lng }}</p>
         <p> Centro {{ currentCenter }} o zoom é: {{ currentZoom }}</p>
         <button @click="showLongText">
@@ -16,14 +18,16 @@
         </button>
         </div>
         <l-map
-        v-if="showMap"
-        :zoom="zoom"
-        :center="center"
-        :options="mapOptions"
-        style="height: 60%"
-        @update:center="centerUpdate"
-        @update:zoom="zoomUpdate"
-        >
+            ref="map"
+            v-if="showMap"
+            :zoom="zoom"
+            :center="center"
+            :options="mapOptions"
+            style="height: 60%"
+            @update:center="centerUpdate"
+            @update:zoom="zoomUpdate"
+            @ready="doSomethingOnReady()"
+            >
         <l-tile-layer
             :url="url"
             :attribution="attribution"
@@ -54,15 +58,16 @@
         </l-marker>
         </l-map>
     </div>
--->
+
   </div>
 
-</template>
+</template> 
 
 <script>
 import L, { latLng }  from 'leaflet';
-//import { LMap, LTileLayer, LMarker, LPopup, LTooltip } from "vue2-leaflet";
-import * as PIXI from 'pixi.js';
+import { LMap, LTileLayer, LMarker, LPopup, LTooltip } from "vue2-leaflet";
+import * as PIXI from 'pixi.js'; 
+import "leaflet/dist/leaflet.css";
 import 'leaflet-pixi-overlay';
 
 export default {
@@ -71,11 +76,11 @@ export default {
     msg: String
   },
  components: {
-    /* LMap,
+    LMap,
     LTileLayer,
     LMarker,
     LPopup,
-    LTooltip */
+    LTooltip 
  },
   data() {
     return {
@@ -92,6 +97,8 @@ export default {
         zoomSnap: 0.5
       },
       showMap: true,
+      pOverlay:null,
+      map: null
     };
   },
   methods: {
@@ -106,6 +113,9 @@ export default {
     },
     innerClick() {
       alert("Click!");
+    },
+    doSomethingOnReady() {
+        this.map = this.$refs.map.mapObject
     },
     draw() {
         let loader = new PIXI.Loader()
@@ -144,18 +154,24 @@ export default {
                 renderer.render(container)
             }, pixiContainer)
 
-            pixiOverlay.addTo(this.map)
+            pixiOverlay.addTo(this.$refs.map.mapObject)
+
+          //  this.pOverlay = pixiOverlay;
         })
-    },
+    }, 
   },
   mounted() { 
-        this.map = L.map(this.$refs.map).setView([51.505, -0.09], 13)
+       /* this.map = L.map(this.$refs.map).setView([51.505, -0.09], 13)
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 18,
-        }).addTo(this.map)
+        }).addTo(this.map) */
 
-        this.draw()
+        this.$nextTick(() => {
+            this.map = this.$refs.map.mapObject // work as expected
+        })
+
+        this.draw() 
     }
 }
 </script>
