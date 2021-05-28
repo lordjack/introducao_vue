@@ -13,11 +13,12 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
         integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
         crossorigin=""></script>
+    <script src="node_modules/pixi.js/dist/esm/pixi.js"></script>
+    <script src="node_modules/leaflet-pixi-overlay/L.PixiOverlay.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
 
-    <script src="node_modules/leaflet-pixi-overlay/L.PixiOverlay.min.js"></script>
 </head>
 
 <body>
@@ -64,10 +65,11 @@
 
     </script> -->
     <div id='app'>
-        <div ref='map' style='height: 400px'></div>
+        <div ref='map' style='height: 300px'></div>
     </div>
 
     <script>
+        import PIXI from 'pixi';
         new Vue({
             methods: {
                 draw() {
@@ -125,7 +127,7 @@
 
     </script>
 
-    <!-- 
+
     <div id="app-2">
         <span v-bind:title="message">
             Pare o mouse sobre mim e veja a dica interligada dinamicamente!
@@ -155,7 +157,7 @@
                 message: 'Você carregou esta página em ' + new Date().toLocaleString()
             }
         })
-    </script> -->
+    </script>
 </body>
 
 </html>
