@@ -1,18 +1,23 @@
 <template>
   <div id="app">
-    <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
-    <PixiOverlay msg="PixiOverlay"/>
+    <!-- <PixiOverlay msg="PixiOverlay"/>-->
+     <div id="nav">
+      <router-link to="/helloworld">Início</router-link> |
+      <router-link to="/pixioverlay">Exemplo Pixi Overlay</router-link>
+    </div> 
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
 //import HelloWorld from './components/HelloWorld.vue'
-import PixiOverlay from './components/PixiOverlay.vue'
+//import PixiOverlay from './components/PixiOverlay.vue'
 
 export default {
   name: 'App',
   components: {
-    PixiOverlay
+   // PixiOverlay,
+  //  HelloWorld
   }
 }
 </script>

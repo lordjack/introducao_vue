@@ -1,10 +1,7 @@
 <template>
   <div class="hello">
     <h1> Olá {{ msg }}</h1>
-    <div id='app'>
-       <div ref='map' style='height: 300px'></div> 
-    </div>
-  
+   
     <div style="height: 500px; width: 100%">
         <div style="height: 200px; overflow: auto;">
           <h1> teste1 <!-- {{  pOverlay */ }} --></h1>
@@ -23,10 +20,9 @@
             :zoom="zoom"
             :center="center"
             :options="mapOptions"
-            style="height: 60%"
+            style="height: 90%"
             @update:center="centerUpdate"
             @update:zoom="zoomUpdate"
-            @ready="doSomethingOnReady()"
             >
         <l-tile-layer
             :url="url"
@@ -58,9 +54,9 @@
         </l-marker>
         </l-map>
     </div>
+    <router-view></router-view>
 
   </div>
-
 </template> 
 
 <script>
@@ -97,7 +93,6 @@ export default {
         zoomSnap: 0.5
       },
       showMap: true,
-      pOverlay:null,
       map: null
     };
   },
@@ -114,15 +109,59 @@ export default {
     innerClick() {
       alert("Click!");
     },
-    doSomethingOnReady() {
-        this.map = this.$refs.map.mapObject
-    },
+   
     draw() {
+/*
+        // exemplo com poligonos
+        var polygonLatLngs = [
+            [51.509, -0.08],
+            [51.503, -0.06],
+            [51.51, -0.047],
+            [51.509, -0.08]
+        ];
+        var projectedPolygon;
+        var triangle = new PIXI.Graphics();
+
+        var pixiContainer = new PIXI.Container();
+        pixiContainer.addChild(triangle);
+
+        var firstDraw = true;
+        var prevZoom;
+
+        var pixiOverlay = L.pixiOverlay(function(utils) {
+            var zoom = utils.getMap().getZoom();
+            var container = utils.getContainer();
+            var renderer = utils.getRenderer();
+            var project = utils.latLngToLayerPoint;
+            var scale = utils.getScale();
+
+            if (firstDraw) {
+                projectedPolygon = polygonLatLngs.map(function(coords) {return project(coords);});
+            }
+            if (firstDraw || prevZoom !== zoom) {
+                triangle.clear();
+                triangle.lineStyle(3 / scale, 0x3388ff, 1);
+                triangle.beginFill(0x3388ff, 0.2);
+                projectedPolygon.forEach(function(coords, index) {
+                    if (index == 0) triangle.moveTo(coords.x, coords.y);
+                    else triangle.lineTo(coords.x, coords.y);
+                });
+                triangle.endFill();
+            }
+            firstDraw = false;
+            prevZoom = zoom;
+            renderer.render(container);
+        }, pixiContainer);
+        pixiOverlay.addTo(this.$refs.map.mapObject)
+*/
+        //------------------------------------------------
+        
+        // exemplo com marcador
         let loader = new PIXI.Loader()
         loader.add('marker', 'https://pixijs.io/examples/examples/assets/bunny.png')
         loader.load((loader, resources) => {
             let markerTexture = resources.marker.texture
-            let markerLatLng = [51.505, -0.09]
+            let markerLatLng = [47.405437, -1.23373]
             let marker = new PIXI.Sprite(markerTexture)
             marker.anchor.set(0.5, 1)
 
@@ -153,19 +192,13 @@ export default {
                 prevZoom = zoom
                 renderer.render(container)
             }, pixiContainer)
-
             pixiOverlay.addTo(this.$refs.map.mapObject)
 
-          //  this.pOverlay = pixiOverlay;
         })
+    
     }, 
   },
   mounted() { 
-       /* this.map = L.map(this.$refs.map).setView([51.505, -0.09], 13)
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 18,
-        }).addTo(this.map) */
 
         this.$nextTick(() => {
             this.map = this.$refs.map.mapObject // work as expected
