@@ -5,7 +5,7 @@
     <div style="height: 500px; width: 100%">
       <div style="height: 200px; overflow: auto">
         <h1>
-          teste1
+          teste 02
           <!-- {{  pOverlay */ }} -->
         </h1>
         <p>Marcação lugar no Mapa {{ withPopup.lat }}, {{ withPopup.lng }}</p>
@@ -62,7 +62,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-pixi-overlay";
 
 export default {
-  name: "PixiOverlay",
+  name: "PixiOverlayTeste2",
   props: {
     msg: String,
   },
@@ -107,97 +107,86 @@ export default {
     },
 
     draw() {
-      /*
-        // exemplo com poligonos
-        var polygonLatLngs = [
-            [51.509, -0.08],
-            [51.503, -0.06],
-            [51.51, -0.047],
-            [51.509, -0.08]
-        ];
-        var projectedPolygon;
-        var triangle = new PIXI.Graphics();
+      // exemplo com marcador
 
-        var pixiContainer = new PIXI.Container();
-        pixiContainer.addChild(triangle);
+      function getRandom(min, max) {
+        return min + Math.random() * (max - min);
+      }
+      var markersLength = 10;
 
-        var firstDraw = true;
-        var prevZoom;
-
-        var pixiOverlay = L.pixiOverlay(function(utils) {
-            var zoom = utils.getMap().getZoom();
-            var container = utils.getContainer();
-            var renderer = utils.getRenderer();
-            var project = utils.latLngToLayerPoint;
-            var scale = utils.getScale();
-
-            if (firstDraw) {
-                projectedPolygon = polygonLatLngs.map(function(coords) {return project(coords);});
-            }
-            if (firstDraw || prevZoom !== zoom) {
-                triangle.clear();
-                triangle.lineStyle(3 / scale, 0x3388ff, 1);
-                triangle.beginFill(0x3388ff, 0.2);
-                projectedPolygon.forEach(function(coords, index) {
-                    if (index == 0) triangle.moveTo(coords.x, coords.y);
-                    else triangle.lineTo(coords.x, coords.y);
-                });
-                triangle.endFill();
-            }
-            firstDraw = false;
-            prevZoom = zoom;
-            renderer.render(container);
-        }, pixiContainer);
-        pixiOverlay.addTo(this.$refs.map.mapObject)
-*/
-      //------------------------------------------------
-
-      //carregador
       let loader = new PIXI.Loader();
+      //C:\laragon\www\projetos\introducao_vue\src\components\PixiOverlayTeste2.vue
+      //https://icons-for-free.com/iconfiles/png/512/marker-131994967950423839.png
       loader.add("marker", "https://pixijs.io/examples/examples/assets/bunny.png");
-      loader.load((loader, resources) => {
-        //textura
-        let markerTexture = resources.marker.texture;
-        let markerLatLng = [47.405437, -1.23373];
-        let marker = new PIXI.Sprite(markerTexture);
 
-        //ancora local de origem valor padrão 0.0
+      loader.load((loader, resources) => {
+        let texture = resources.marker.texture;
+        let markerLatLng = [47.405437, -1.23373];
+        let marker = new PIXI.Sprite(texture);
         marker.anchor.set(0.5, 1);
 
-        //conteiner para carregar os objetos
         let pixiContainer = new PIXI.Container();
-        pixiContainer.addChild(marker);
+        // pixiContainer.addChild(marker);
+        var innerContainer = new PIXI.particles.ParticleContainer(markersLength, {
+          vertices: true,
+        });
+        innerContainer.texture = texture;
+        innerContainer.baseTexture = texture.baseTexture;
+        innerContainer.anchor = { x: 0.5, y: 1 };
 
-        //variaveis que serão as flags
+        pixiContainer.addChild(innerContainer);
+
         let firstDraw = true;
         let prevZoom;
-
-        //cria uma camada de sobrepossição
-        let pixiOverlay = L.pixiOverlay((utils) => {
+        var initialScale;
+        let pixiOverlay = L.pixiOverlay((utils, event) => {
           let zoom = utils.getMap().getZoom();
           let container = utils.getContainer();
           let renderer = utils.getRenderer();
           let project = utils.latLngToLayerPoint;
           let scale = utils.getScale();
 
+          if (event.type === "add") {
+            var origin = project([(48.7 + 49) / 2, (2.2 + 2.8) / 2]);
+            innerContainer.x = origin.x;
+            innerContainer.y = origin.y;
+            initialScale = scale / 8;
+            innerContainer.localScale = initialScale;
+            for (var i = 0; i < markersLength; i++) {
+              var coords = project([getRandom(48.7, 49), getRandom(2.2, 2.8)]);
+              // our patched particleContainer accepts simple {x: ..., y: ...} objects as children:
+              innerContainer.addChild({
+                x: coords.x - origin.x,
+                y: coords.y - origin.y,
+              });
+            }
+          }
+          /* if (event.type === "zoomanim") {
+            var targetZoom = event.zoom;
+            if (targetZoom >= 16 || zoom >= 16) {
+              zoomChangeTs = 0;
+              var targetScale =
+                targetZoom >= 16 ? 1 / getScale(event.zoom) : initialScale;
+              innerContainer.currentScale = innerContainer.localScale;
+              innerContainer.targetScale = targetScale;
+            }
+            return;
+          } */
+
           if (firstDraw) {
-            //seta as coordenadas ao marcador
             let markerCoords = project(markerLatLng);
             marker.x = markerCoords.x;
             marker.y = markerCoords.y;
           }
 
-          //definição da escala do marcador
           if (firstDraw || prevZoom !== zoom) {
             marker.scale.set(1 / scale);
           }
 
           firstDraw = true;
           prevZoom = zoom;
-          //renderiza o objeto para sobreposição
           renderer.render(container);
         }, pixiContainer);
-        //adiciona a sobreposição no mapa de referencia
         pixiOverlay.addTo(this.$refs.map.mapObject);
       });
     },

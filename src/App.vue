@@ -1,10 +1,13 @@
 <template>
   <div id="app">
     <!-- <PixiOverlay msg="PixiOverlay"/>-->
-     <div id="nav">
+    <div id="nav">
       <router-link to="/helloworld">Início</router-link> |
-      <router-link to="/pixioverlay">Exemplo Pixi Overlay</router-link>
-    </div> 
+      <router-link to="/pixioverlay"> Exemplo Pixi Overlay |</router-link>
+      <router-link to="/pixioverlayteste2">
+        Exemplo Pixi Overlay Um Milhão de Marcações</router-link
+      >
+    </div>
     <router-view></router-view>
   </div>
 </template>
@@ -14,12 +17,12 @@
 //import PixiOverlay from './components/PixiOverlay.vue'
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-   // PixiOverlay,
-  //  HelloWorld
-  }
-}
+    // PixiOverlay,
+    //  HelloWorld
+  },
+};
 </script>
 
 <style>
