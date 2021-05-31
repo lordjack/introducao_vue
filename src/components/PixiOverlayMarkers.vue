@@ -136,6 +136,7 @@ export default {
           var zoomChangeTs = null;
           var pixiContainer = new PIXI.Container();
           var innerContainer = new PIXI.particles.ParticleContainer(markersLength, {
+            // var innerContainer = new PIXI.ParticleContainer(markersLength, {
             vertices: true,
           });
           // add properties for our patched particleRenderer:

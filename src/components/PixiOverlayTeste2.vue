@@ -58,6 +58,7 @@
 import L, { latLng } from "leaflet";
 import { LMap, LTileLayer, LMarker, LPopup, LTooltip } from "vue2-leaflet";
 import * as PIXI from "pixi.js";
+//import {Loader, Container, ParticleContainer} from "pixi.js";
 import "leaflet/dist/leaflet.css";
 import "leaflet-pixi-overlay";
 
@@ -107,50 +108,42 @@ export default {
     },
 
     draw() {
-      // exemplo com marcador
-
-      function getRandom(min, max) {
-        return min + Math.random() * (max - min);
-      }
-      var markersLength = 10;
-
-      let loader = new PIXI.Loader();
-      //C:\laragon\www\projetos\introducao_vue\src\components\PixiOverlayTeste2.vue
-      //https://icons-for-free.com/iconfiles/png/512/marker-131994967950423839.png
-      loader.add("marker", "https://pixijs.io/examples/examples/assets/bunny.png");
-
+      //マーカー最大個数
+      var markersLength = 1000000;
+      //particles, Loader, Container, ParticleContainer
+      //Draw a marker
+      var loader = new PIXI.Loader();
+      loader.add("marker", "https://pixijs.io/examples/examples/assets/bunny.png"); //リソースにmarkerという名で'img/marker-icon.png'を登録
       loader.load((loader, resources) => {
-        let texture = resources.marker.texture;
-        let markerLatLng = [47.405437, -1.23373];
-        let marker = new PIXI.Sprite(texture);
-        marker.anchor.set(0.5, 1);
+        //リソース(marker)をロードする
+        var texture = resources.marker.texture;
 
-        let pixiContainer = new PIXI.Container();
-        // pixiContainer.addChild(marker);
-        var innerContainer = new PIXI.particles.ParticleContainer(markersLength, {
+        var pixiContainer = new PIXI.Container();
+        var innerContainer = new PIXI.ParticleContainer(markersLength, {
           vertices: true,
         });
         innerContainer.texture = texture;
         innerContainer.baseTexture = texture.baseTexture;
         innerContainer.anchor = { x: 0.5, y: 1 };
-
         pixiContainer.addChild(innerContainer);
 
-        let firstDraw = true;
-        let prevZoom;
+        var firstDraw = true;
+        var prevZoom;
         var initialScale;
-        let pixiOverlay = L.pixiOverlay((utils, event) => {
-          let zoom = utils.getMap().getZoom();
-          let container = utils.getContainer();
-          let renderer = utils.getRenderer();
-          let project = utils.latLngToLayerPoint;
-          let scale = utils.getScale();
 
-          if (event.type === "add") {
+        var pixiOverlay = L.pixiOverlay((utils) => {
+          var zoom = utils.getMap().getZoom();
+          var container = utils.getContainer();
+          var renderer = utils.getRenderer();
+          var project = utils.latLngToLayerPoint;
+          var scale = utils.getScale();
+          var invScale = 1 / scale;
+
+          if (firstDraw) {
             var origin = project([(48.7 + 49) / 2, (2.2 + 2.8) / 2]);
             innerContainer.x = origin.x;
             innerContainer.y = origin.y;
-            initialScale = scale / 8;
+            initialScale = invScale / 8;
             innerContainer.localScale = initialScale;
             for (var i = 0; i < markersLength; i++) {
               var coords = project([getRandom(48.7, 49), getRandom(2.2, 2.8)]);
@@ -161,34 +154,22 @@ export default {
               });
             }
           }
-          /* if (event.type === "zoomanim") {
-            var targetZoom = event.zoom;
-            if (targetZoom >= 16 || zoom >= 16) {
-              zoomChangeTs = 0;
-              var targetScale =
-                targetZoom >= 16 ? 1 / getScale(event.zoom) : initialScale;
-              innerContainer.currentScale = innerContainer.localScale;
-              innerContainer.targetScale = targetScale;
-            }
-            return;
-          } */
-
-          if (firstDraw) {
-            let markerCoords = project(markerLatLng);
-            marker.x = markerCoords.x;
-            marker.y = markerCoords.y;
-          }
 
           if (firstDraw || prevZoom !== zoom) {
-            marker.scale.set(1 / scale);
+            innerContainer.localScale = zoom < 8 ? 0.1 : initialScale; // 1 / scale;
           }
 
-          firstDraw = true;
+          firstDraw = false;
           prevZoom = zoom;
-          renderer.render(container);
+          renderer.render(container); //オーバーレイ上にあるオブジェクトの再描画する。
         }, pixiContainer);
+
         pixiOverlay.addTo(this.$refs.map.mapObject);
       });
+
+      function getRandom(min, max) {
+        return min + Math.random() * (max - min);
+      }
     },
   },
   mounted() {
