@@ -162,16 +162,30 @@ export default {
         //  let markerLatLng = [47.405437, -1.23373];
         let marker = new PIXI.Sprite(markerTexture);
 
+        /*
+let settlement = new PIXI.Sprite(PIXI.loader.resources.settlement_red.texture)
+settlement.height = 10
+settlement.width = 10
+settlement.x = 0
+settlement.y = 0
+chatContainer.addChild(settlement)
+*/
+
         //ancora local de origem valor padrão 0.0
         marker.anchor.set(0.5, 1);
+        // var zoomChangeTs = null;
 
         //conteiner para carregar os objetos
         let pixiContainer = new PIXI.Container();
         pixiContainer.addChild(marker);
 
+        let innerContainer = new PIXI.Container();
+        pixiContainer.addChild(innerContainer);
+
         //variaveis que serão as flags
         let firstDraw = true;
         let prevZoom;
+        //  var initialScale;
 
         //cria uma camada de sobrepossição
         let pixiOverlay = L.pixiOverlay((utils) => {
@@ -186,11 +200,18 @@ export default {
             /*     let markerCoords = project(markerLatLng);
             marker.x = markerCoords.x;
             marker.y = markerCoords.y; */
-            var origin = project([(48.7 + 49) / 2, (2.2 + 2.8) / 2]);
+            // var origin = project([(48.7 + 49) / 2, (2.2 + 2.8) / 2]);
             for (var i = 0; i < markersLength; i++) {
               var coords = project([getRandom(48.7, 49), getRandom(2.2, 2.8)]);
-              //     debugger;
-              container.addChild({ x: coords.x - origin.x, y: coords.y - origin.y });
+              //  debugger;
+              const bunny = new PIXI.Sprite(markerTexture);
+              bunny.anchor.set(0.5);
+              /* bunny.x = coords.x - origin.x;
+              bunny.y = coords.y - origin.y; */
+              bunny.x = coords.x;
+              bunny.y = coords.y;
+
+              innerContainer.addChild(bunny);
             }
           }
 
@@ -198,6 +219,36 @@ export default {
           if (firstDraw || prevZoom !== zoom) {
             marker.scale.set(1 / scale);
           }
+          /* 
+          if (event.type === "zoomanim") {
+            var targetZoom = event.zoom;
+            if (targetZoom >= 16 || zoom >= 16) {
+              zoomChangeTs = 0;
+              var targetScale = targetZoom >= 16 ? 1 / scale(event.zoom) : initialScale;
+              innerContainer.currentScale = innerContainer.localScale;
+              innerContainer.targetScale = targetScale;
+            }
+            return;
+          }
+
+          if (event.type === "redraw") {
+            var delta = event.delta;
+            if (zoomChangeTs !== null) {
+              var duration = 17;
+              zoomChangeTs += delta;
+              var lambda = zoomChangeTs / duration;
+              if (lambda > 1) {
+                lambda = 1;
+                zoomChangeTs = null;
+              }
+              //lambda = easing(lambda);
+              innerContainer.localScale =
+                innerContainer.currentScale +
+                lambda * (innerContainer.targetScale - innerContainer.currentScale);
+            } else {
+              return;
+            }
+          } */
 
           firstDraw = true;
           prevZoom = zoom;
