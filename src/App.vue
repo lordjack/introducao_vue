@@ -4,9 +4,9 @@
     <div id="nav">
       <router-link to="/helloworld">Início</router-link> |
       <router-link to="/pixioverlay"> Exemplo Pixi Overlay |</router-link>
-      <router-link to="/pixioverlayteste2">
-        Exemplo Pixi Overlay Um Milhão de Marcações</router-link
-      >
+      <router-link to="/pixioverlayteste2"> Exemplo 02 - Pixi Overlay | </router-link>
+      <router-link to="/PixiOverlayTeste3"> Exemplo 03 - Pixi Overlay | </router-link>
+      <router-link to="/PixiOverlayTeste4"> Exemplo 04 - Pixi Overlay</router-link>
     </div>
     <router-view></router-view>
   </div>

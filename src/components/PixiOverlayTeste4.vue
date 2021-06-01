@@ -5,7 +5,7 @@
     <div style="height: 500px; width: 100%">
       <div style="height: 200px; overflow: auto">
         <h1>
-          teste1
+          teste4
           <!-- {{  pOverlay */ }} -->
         </h1>
         <p>Marcação lugar no Mapa {{ withPopup.lat }}, {{ withPopup.lng }}</p>
@@ -62,7 +62,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-pixi-overlay";
 
 export default {
-  name: "PixiOverlay",
+  name: "PixiOverlayTeste4",
   props: {
     msg: String,
   },
@@ -153,12 +153,13 @@ export default {
       //------------------------------------------------
 
       //carregador
+      var markersLength = 10;
       var loader = new PIXI.loaders.Loader();
       loader.add("marker", "https://pixijs.io/examples/examples/assets/bunny.png");
       loader.load((loader, resources) => {
         //textura
         let markerTexture = resources.marker.texture;
-        let markerLatLng = [47.405437, -1.23373];
+        //  let markerLatLng = [47.405437, -1.23373];
         let marker = new PIXI.Sprite(markerTexture);
 
         //ancora local de origem valor padrão 0.0
@@ -182,9 +183,15 @@ export default {
 
           if (firstDraw) {
             //seta as coordenadas ao marcador
-            let markerCoords = project(markerLatLng);
+            /*     let markerCoords = project(markerLatLng);
             marker.x = markerCoords.x;
-            marker.y = markerCoords.y;
+            marker.y = markerCoords.y; */
+            var origin = project([(48.7 + 49) / 2, (2.2 + 2.8) / 2]);
+            for (var i = 0; i < markersLength; i++) {
+              var coords = project([getRandom(48.7, 49), getRandom(2.2, 2.8)]);
+              //     debugger;
+              container.addChild({ x: coords.x - origin.x, y: coords.y - origin.y });
+            }
           }
 
           //definição da escala do marcador
@@ -200,6 +207,9 @@ export default {
         //adiciona a sobreposição no mapa de referencia
         pixiOverlay.addTo(this.$refs.map.mapObject);
       });
+      function getRandom(min, max) {
+        return min + Math.random() * (max - min);
+      }
     },
   },
   mounted() {

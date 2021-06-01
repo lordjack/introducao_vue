@@ -108,61 +108,69 @@ export default {
     },
 
     draw() {
-      //マーカー最大個数
       var markersLength = 1000000;
       //particles, Loader, Container, ParticleContainer
       //Draw a marker
-      var loader = new PIXI.Loader();
-      loader.add("marker", "https://pixijs.io/examples/examples/assets/bunny.png"); //リソースにmarkerという名で'img/marker-icon.png'を登録
+      var loader = new PIXI.loaders.Loader();
+      loader.add("marker", "https://pixijs.io/examples/examples/assets/bunny.png");
       loader.load((loader, resources) => {
-        //リソース(marker)をロードする
         var texture = resources.marker.texture;
 
         var pixiContainer = new PIXI.Container();
-        var innerContainer = new PIXI.ParticleContainer(markersLength, {
+        var innerContainer = new PIXI.particles.ParticleContainer(markersLength, {
           vertices: true,
         });
+        // add properties for our patched particleRenderer:
         innerContainer.texture = texture;
         innerContainer.baseTexture = texture.baseTexture;
         innerContainer.anchor = { x: 0.5, y: 1 };
-        pixiContainer.addChild(innerContainer);
 
+        pixiContainer.addChild(innerContainer);
+        var doubleBuffering =
+          /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         var firstDraw = true;
         var prevZoom;
         var initialScale;
 
-        var pixiOverlay = L.pixiOverlay((utils) => {
-          var zoom = utils.getMap().getZoom();
-          var container = utils.getContainer();
-          var renderer = utils.getRenderer();
-          var project = utils.latLngToLayerPoint;
-          var scale = utils.getScale();
-          var invScale = 1 / scale;
+        var pixiOverlay = L.pixiOverlay(
+          (utils) => {
+            var zoom = utils.getMap().getZoom();
+            var container = utils.getContainer();
+            var renderer = utils.getRenderer();
+            var project = utils.latLngToLayerPoint;
+            var scale = utils.getScale();
+            var invScale = 1 / scale;
 
-          if (firstDraw) {
-            var origin = project([(48.7 + 49) / 2, (2.2 + 2.8) / 2]);
-            innerContainer.x = origin.x;
-            innerContainer.y = origin.y;
-            initialScale = invScale / 8;
-            innerContainer.localScale = initialScale;
-            for (var i = 0; i < markersLength; i++) {
-              var coords = project([getRandom(48.7, 49), getRandom(2.2, 2.8)]);
-              // our patched particleContainer accepts simple {x: ..., y: ...} objects as children:
-              innerContainer.addChild({
-                x: coords.x - origin.x,
-                y: coords.y - origin.y,
-              });
+            if (firstDraw) {
+              var origin = project([(48.7 + 49) / 2, (2.2 + 2.8) / 2]);
+              innerContainer.x = origin.x;
+              innerContainer.y = origin.y;
+              initialScale = invScale / 8;
+              innerContainer.localScale = initialScale;
+              for (var i = 0; i < markersLength; i++) {
+                var coords = project([getRandom(48.7, 49), getRandom(2.2, 2.8)]);
+                // our patched particleContainer accepts simple {x: ..., y: ...} objects as children:
+                innerContainer.addChild({
+                  x: coords.x - origin.x,
+                  y: coords.y - origin.y,
+                });
+              }
             }
-          }
 
-          if (firstDraw || prevZoom !== zoom) {
-            innerContainer.localScale = zoom < 8 ? 0.1 : initialScale; // 1 / scale;
-          }
+            if (firstDraw || prevZoom !== zoom) {
+              innerContainer.localScale = zoom < 8 ? 0.1 : initialScale; // 1 / scale;
+            }
 
-          firstDraw = false;
-          prevZoom = zoom;
-          renderer.render(container); //オーバーレイ上にあるオブジェクトの再描画する。
-        }, pixiContainer);
+            firstDraw = false;
+            prevZoom = zoom;
+            renderer.render(container);
+          },
+          pixiContainer,
+          {
+            doubleBuffering: doubleBuffering,
+            destroyInteractionManager: true,
+          }
+        );
 
         pixiOverlay.addTo(this.$refs.map.mapObject);
       });
