@@ -4,10 +4,7 @@
 
     <div style="height: 500px; width: 100%">
       <div style="height: 200px; overflow: auto">
-        <h1>
-          teste1
-          <!-- {{  pOverlay */ }} -->
-        </h1>
+        <h1>teste6</h1>
         <p>Marcação lugar no Mapa {{ withPopup.lat }}, {{ withPopup.lng }}</p>
         <p>Centro {{ currentCenter }} o zoom é: {{ currentZoom }}</p>
         <button @click="showLongText">Teste</button>
@@ -60,11 +57,13 @@ import { LMap, LTileLayer, LMarker, LPopup, LTooltip } from "vue2-leaflet";
 import * as PIXI from "pixi.js";
 import "leaflet/dist/leaflet.css";
 import "leaflet-pixi-overlay";
-//import * as d3 from "d3";
 import "../assets/js/tools.min.js";
+import * as d3 from "d3";
+//import json from "./data/communes.json";
+import axios from "axios";
 
 export default {
-  name: "PixiOverlay",
+  name: "PixiOverlayTeste6",
   props: {
     msg: String,
   },
@@ -92,6 +91,7 @@ export default {
       },
       showMap: true,
       map: null,
+      info: null,
     };
   },
   methods: {
@@ -109,113 +109,96 @@ export default {
     },
 
     draw() {
-      /*
-        // exemplo com poligonos
-        var polygonLatLngs = [
-            [51.509, -0.08],
-            [51.503, -0.06],
-            [51.51, -0.047],
-            [51.509, -0.08]
-        ];
-        var projectedPolygon;
-        var triangle = new PIXI.Graphics();
+      var loader = new PIXI.loaders.Loader();
+      loader
+        .add("plane", "../assets/img/plane.png")
+        .add("bicycle", "../assets/img/bicycle.png");
+
+      loader.load(async (loader, resources) => {
+        var textures = [resources.plane.texture, resources.bicycle.texture];
+
+        const response = await axios.get("data/cities.json");
+        var markers = response.data;
+
+        var vm = this;
+        vm.map.attributionControl.setPosition("bottomleft");
+        vm.map.zoomControl.setPosition("bottomright");
 
         var pixiContainer = new PIXI.Container();
-        pixiContainer.addChild(triangle);
+        var markerSprites = [];
+        var previousZoom = null;
+        var colorScale = d3
+          .scaleLinear()
+          .domain([0, 50, 100])
+          .range(["#c6233c", "#ffd300", "#008000"]);
+        var doubleBuffering =
+          /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-        var firstDraw = true;
-        var prevZoom;
-
-        var pixiOverlay = L.pixiOverlay(function(utils) {
+        var pixiOverlay = L.pixiOverlay(
+          (utils, event) => {
             var zoom = utils.getMap().getZoom();
             var container = utils.getContainer();
             var renderer = utils.getRenderer();
             var project = utils.latLngToLayerPoint;
             var scale = utils.getScale();
+            var invScale = 1 / scale;
+            //   markerSprites.map((markerSprite) => {
+            if (event.type === "add") {
+              // markers.forEach(function (marker) {
+              markers.map((marker) => {
+                var coords = project([marker.latitude, marker.longitude]);
+                var index = Math.floor(Math.random() * textures.length);
+                var markerSprite = new PIXI.Sprite(textures[index]);
+                markerSprite.textureIndex = index;
+                markerSprite.x = coords.x;
+                markerSprite.y = coords.y;
+                markerSprite.anchor.set(0.5, 0.5);
+                markerSprite.scale.set(invScale);
+                var tint = d3.color(colorScale(Math.random() * 100)).rgb();
+                markerSprite.tint = 256 * (tint.r * 256 + tint.g) + tint.b;
+                container.addChild(markerSprite);
+                markerSprites.push(markerSprite);
+              });
+            }
 
-            if (firstDraw) {
-                projectedPolygon = polygonLatLngs.map(function(coords) {return project(coords);});
+            if (event.type === "moveend" && previousZoom !== zoom) {
+              markerSprites.map((markerSprite) => {
+                //  markerSprites.forEach(function (markerSprite) {
+                markerSprite.scale.set(invScale);
+              });
+              previousZoom = zoom;
             }
-            if (firstDraw || prevZoom !== zoom) {
-                triangle.clear();
-                triangle.lineStyle(3 / scale, 0x3388ff, 1);
-                triangle.beginFill(0x3388ff, 0.2);
-                projectedPolygon.forEach(function(coords, index) {
-                    if (index == 0) triangle.moveTo(coords.x, coords.y);
-                    else triangle.lineTo(coords.x, coords.y);
-                });
-                triangle.endFill();
+
+            if (event.type === "redraw") {
+              var delta = event.delta;
+              markerSprites.map((markerSprite) => {
+                // markerSprites.forEach(function (markerSprite) {
+                markerSprite.rotation -= 0.03 * delta;
+              });
             }
-            firstDraw = false;
-            prevZoom = zoom;
             renderer.render(container);
-        }, pixiContainer);
-        pixiOverlay.addTo(this.$refs.map.mapObject)
-*/
-      //------------------------------------------------
-      var a = window.solveCollision([], { r0: 0, zoom: 5 });
-      console.log(a);
-      console.log("test");
-      //carregador
-      var loader = new PIXI.loaders.Loader();
-      loader.add("marker", "https://pixijs.io/examples/examples/assets/bunny.png");
-      loader.load((loader, resources) => {
-        //textura
-        let markerTexture = resources.marker.texture;
-        let markerLatLng = [47.405437, -1.23373];
-        let marker = new PIXI.Sprite(markerTexture);
-
-        //ancora local de origem valor padrão 0.0
-        marker.anchor.set(0.5, 1);
-
-        //conteiner para carregar os objetos
-        let pixiContainer = new PIXI.Container();
-        pixiContainer.addChild(marker);
-
-        //variaveis que serão as flags
-        let firstDraw = true;
-        let prevZoom;
-
-        //cria uma camada de sobrepossição
-        let pixiOverlay = L.pixiOverlay((utils) => {
-          let zoom = utils.getMap().getZoom();
-          let container = utils.getContainer();
-          let renderer = utils.getRenderer();
-          let project = utils.latLngToLayerPoint;
-          let scale = utils.getScale();
-
-          if (firstDraw) {
-            //seta as coordenadas ao marcador
-            let markerCoords = project(markerLatLng);
-            marker.x = markerCoords.x;
-            marker.y = markerCoords.y;
+          },
+          pixiContainer,
+          {
+            doubleBuffering: doubleBuffering,
           }
-
-          //definição da escala do marcador
-          if (firstDraw || prevZoom !== zoom) {
-            marker.scale.set(1 / scale);
-          }
-
-          firstDraw = true;
-          prevZoom = zoom;
-          //renderiza o objeto para sobreposição
-          renderer.render(container);
-        }, pixiContainer);
+        );
+        //      };
         //adiciona a sobreposição no mapa de referencia
         pixiOverlay.addTo(this.$refs.map.mapObject);
+
+        var ticker = new PIXI.ticker.Ticker();
+        ticker.add(function (delta) {
+          pixiOverlay.redraw({ type: "redraw", delta: delta });
+        });
+        ticker.start();
       });
     },
   },
   mounted() {
-    let externalScript = document.createElement("script");
-    externalScript.setAttribute("src", "js/tools.min.js");
-    externalScript.async = true;
-    document.head.appendChild(externalScript);
-
     this.$nextTick(() => {
       this.map = this.$refs.map.mapObject; // work as expected
     });
-
     this.draw();
   },
 };
