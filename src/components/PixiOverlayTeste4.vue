@@ -173,7 +173,7 @@ chatContainer.addChild(settlement)
 
         //ancora local de origem valor padrão 0.0
         marker.anchor.set(0.5, 1);
-        // var zoomChangeTs = null;
+        //   var zoomChangeTs = 1;
 
         //conteiner para carregar os objetos
         let pixiContainer = new PIXI.Container();
@@ -185,7 +185,7 @@ chatContainer.addChild(settlement)
         //variaveis que serão as flags
         let firstDraw = true;
         let prevZoom;
-        //  var initialScale;
+        //    var initialScale;
 
         //cria uma camada de sobrepossição
         let pixiOverlay = L.pixiOverlay((utils) => {
@@ -199,10 +199,13 @@ chatContainer.addChild(settlement)
             //seta as coordenadas ao marcador
             /*     let markerCoords = project(markerLatLng);
             marker.x = markerCoords.x;
-            marker.y = markerCoords.y; */
+            marker.y = markerCoords.y; 
+latLng(47.41322, -1.219482)
+*/
+
             // var origin = project([(48.7 + 49) / 2, (2.2 + 2.8) / 2]);
             for (var i = 0; i < markersLength; i++) {
-              var coords = project([getRandom(48.7, 49), getRandom(2.2, 2.8)]);
+              var coords = project([getRandom(46.4, 49), getRandom(2.2, 2.8)]);
               //  debugger;
               const bunny = new PIXI.Sprite(markerTexture);
               bunny.anchor.set(0.5);
@@ -219,7 +222,8 @@ chatContainer.addChild(settlement)
           if (firstDraw || prevZoom !== zoom) {
             marker.scale.set(1 / scale);
           }
-          /* 
+          /*
+          debugger;
           if (event.type === "zoomanim") {
             var targetZoom = event.zoom;
             if (targetZoom >= 16 || zoom >= 16) {
@@ -229,7 +233,9 @@ chatContainer.addChild(settlement)
               innerContainer.targetScale = targetScale;
             }
             return;
-          }
+          } else {
+            zoomChangeTs = 1;
+          } 
 
           if (event.type === "redraw") {
             var delta = event.delta;

@@ -7,6 +7,7 @@
       <router-link to="/pixioverlayteste2"> Exemplo 02 - Pixi Overlay | </router-link>
       <router-link to="/PixiOverlayTeste3"> Exemplo 03 - Pixi Overlay | </router-link>
       <router-link to="/PixiOverlayTeste4"> Exemplo 04 - Pixi Overlay</router-link>
+      <router-link to="/PixiOverlayTeste5"> Exemplo 05 - Cidade</router-link>
     </div>
     <router-view></router-view>
   </div>
