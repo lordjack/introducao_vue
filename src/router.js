@@ -8,6 +8,8 @@ import PixiOverlayTeste3 from "./components/PixiOverlayTeste3.vue";
 import PixiOverlayTeste4 from "./components/PixiOverlayTeste4.vue";
 import PixiOverlayTeste5 from "./components/PixiOverlayTeste5.vue";
 import PixiOverlayTeste6 from "./components/PixiOverlayTeste6.vue";
+import PixiOverlayTeste7 from "./components/PixiOverlayTeste7.vue";
+
 
 Vue.use(Router);
 
@@ -47,6 +49,11 @@ export default new Router({
             path: "/PixiOverlayTeste6",
             name: "pixioverlayteste6",
             component: PixiOverlayTeste6
+        },
+        {
+            path: "/PixiOverlayTeste7",
+            name: "pixioverlayteste7",
+            component: PixiOverlayTeste7
         },
         {
             path: "/pixioverlay",

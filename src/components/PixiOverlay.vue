@@ -151,11 +151,13 @@ export default {
             renderer.render(container);
         }, pixiContainer);
         pixiOverlay.addTo(this.$refs.map.mapObject)
-*/
-      //------------------------------------------------
+
       var a = window.solveCollision([], { r0: 0, zoom: 5 });
       console.log(a);
       console.log("test");
+*/
+      //------------------------------------------------
+
       //carregador
       var loader = new PIXI.loaders.Loader();
       loader.add("marker", "https://pixijs.io/examples/examples/assets/bunny.png");
