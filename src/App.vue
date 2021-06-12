@@ -9,7 +9,8 @@
       <router-link to="/PixiOverlayTeste4"> Exemplo 04 - Pixi Overlay | </router-link>
       <router-link to="/PixiOverlayTeste5"> Exemplo 05 - Cidade | </router-link>
       <router-link to="/PixiOverlayTeste6"> Exemplo 06 - Cidade | </router-link>
-      <router-link to="/PixiOverlayTeste7"> Exemplo 07 - Cidade | </router-link>
+      <router-link to="/PixiOverlayTeste7"> Exemplo 07 - USA Markers | </router-link>
+      <router-link to="/PixiOverlayTeste8"> Exemplo 08 - USA Polygonos| </router-link>
     </div>
     <router-view></router-view>
   </div>

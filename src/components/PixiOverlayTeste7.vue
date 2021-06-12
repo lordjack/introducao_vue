@@ -14,18 +14,18 @@
         <button @click="showMap = !showMap">Mostrar/Ocutar</button>
       </div>
       <l-map
-        ref="map"
-        v-if="showMap"
-        :zoom="zoom"
-        :center="center"
-        :options="mapOptions"
-        style="height: 90%"
-        @update:center="centerUpdate"
-        @update:zoom="zoomUpdate"
+          ref="map"
+          v-if="showMap"
+          :zoom="zoom"
+          :center="center"
+          :options="mapOptions"
+          style="height: 90%"
+          @update:center="centerUpdate"
+          @update:zoom="zoomUpdate"
       >
-        <l-tile-layer :url="url" :attribution="attribution" />
+        <l-tile-layer :url="url" :attribution="attribution"/>
         <l-marker :lat-lng="withPopup">
-          <l-icon icon-url="https://pixijs.io/examples/examples/assets/bunny.png" />
+          <l-icon icon-url="https://pixijs.io/examples/examples/assets/bunny.png"/>
           <l-popup>
             <div @click="innerClick">
               Eu sou um popup
@@ -38,7 +38,7 @@
           </l-popup>
         </l-marker>
         <l-marker :lat-lng="withTooltip">
-          <l-icon icon-url="https://pixijs.io/examples/examples/assets/bunny.png" />
+          <l-icon icon-url="https://pixijs.io/examples/examples/assets/bunny.png"/>
           <l-tooltip :options="{ permanent: true, interactive: true }">
             <div @click="innerClick">
               Eu sou um teste
@@ -57,8 +57,8 @@
 </template>
 
 <script>
-import L, { latLng /* icon */ } from "leaflet";
-import { LMap, LTileLayer, LMarker, LIcon, LPopup, LTooltip } from "vue2-leaflet";
+import L, {latLng /* icon */} from "leaflet";
+import {LMap, LTileLayer, LMarker, LIcon, LPopup, LTooltip} from "vue2-leaflet";
 import * as PIXI from "pixi.js";
 import "leaflet/dist/leaflet.css";
 import "leaflet-pixi-overlay";
@@ -83,7 +83,7 @@ export default {
       center: latLng(38.120726, -90.740616),
       url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       attribution:
-        '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+          '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       withPopup: latLng(38.120726, -90.740616),
       withTooltip: latLng(38.120726, -91.740616),
       currentZoom: 11.5,
@@ -140,82 +140,84 @@ export default {
         //    var initialScale;
         var markerSprites = [];
         var doubleBuffering =
-          /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
         //cria uma camada de sobrepossição
         let pixiOverlay = L.pixiOverlay(
-          (utils /* , event */) => {
-            let zoom = utils.getMap().getZoom();
-            let container = utils.getContainer();
-            let renderer = utils.getRenderer();
-            let project = utils.latLngToLayerPoint;
-            let scale = 1 / utils.getScale();
+            (utils/*, event*/) => {
+              let zoom = utils.getMap().getZoom();
+              let container = utils.getContainer();
+              let renderer = utils.getRenderer();
+              let project = utils.latLngToLayerPoint;
+              let scale = 1 / utils.getScale();
 
-            if (firstDraw) {
-              for (var i = 0; i < markers.length; i++) {
-                var coords = project([markers[i].latitude, markers[i].longitude]);
-                //  debugger;
-                //objeto marcador
-                const bunny = new PIXI.Sprite(markerTexture);
-                bunny.anchor.set(0.5);
-                bunny.scale.set(scale);
+              console.log("Qtd de Dados: " + markers.length);
+              if (firstDraw) {
+                for (var i = 0; i < markers.length; i++) {
+                  var coords = project([markers[i].latitude, markers[i].longitude]);
+                  //  debugger;
+                  //objeto marcador
+                  const bunny = new PIXI.Sprite(markerTexture);
+                  bunny.anchor.set(0.5);
+                  bunny.scale.set(scale);
 
-                bunny.x = coords.x;
-                bunny.y = coords.y;
+                  bunny.x = coords.x;
+                  bunny.y = coords.y;
 
-                innerContainer.addChild(bunny);
-                markerSprites.push(bunny);
+                  innerContainer.addChild(bunny);
+                  markerSprites.push(bunny);
+                }
               }
-            }
 
-            //definição da escala do marcador
-            if (firstDraw || prevZoom !== zoom) {
+              //definição da escala do marcador
+              if (firstDraw || prevZoom !== zoom) {
+                markerSprites.forEach(function (markerSprite) {
+                  markerSprite.scale.set(scale);
+                });
+                prevZoom = zoom;
+              }
+
+             /*
+              //   debugger;
+              if (event.type === 'add') {
+                markers.forEach(function (marker) {
+                  var coords = project([marker.latitude, marker.longitude]);
+                  var index = Math.floor(Math.random() * textures.length);
+                  var markerSprite = new PIXI.Sprite(textures[index]);
+                  markerSprite.textureIndex = index;
+                  markerSprite.x = coords.x;
+                  markerSprite.y = coords.y;
+                  markerSprite.anchor.set(0.5, 0.5);
+                  markerSprite.scale.set(scale);
+                  var tint = d3.color(colorScale(Math.random() * 100)).rgb();
+                  markerSprite.tint = 256 * (tint.r * 256 + tint.g) + tint.b;
+                  container.addChild(markerSprite);
+                  markerSprites.push(markerSprite);
+                });
+              }*/
+
+              /*      if (event.type === "moveend" && prevZoom !== zoom) {
               markerSprites.forEach(function (markerSprite) {
                 markerSprite.scale.set(scale);
               });
               prevZoom = zoom;
             }
-            /*
-          debugger;
-       	if (event.type === 'add') {
-            markers.forEach(function(marker) {
-                var coords = project([marker.latitude, marker.longitude]);
-                var index = Math.floor(Math.random() * textures.length);
-                var markerSprite = new PIXI.Sprite(textures[index]);
-                markerSprite.textureIndex = index;
-                markerSprite.x = coords.x;
-                markerSprite.y = coords.y;
-                markerSprite.anchor.set(0.5, 0.5);
-                markerSprite.scale.set(invScale);
-                var tint = d3.color(colorScale(Math.random() * 100)).rgb();
-                markerSprite.tint = 256 * (tint.r * 256 + tint.g) + tint.b;
-                container.addChild(markerSprite);
-                markerSprites.push(markerSprite);
-            });
-        }*/
 
-            /*      if (event.type === "moveend" && prevZoom !== zoom) {
-            markerSprites.forEach(function (markerSprite) {
-              markerSprite.scale.set(scale);
-            });
-            prevZoom = zoom;
-          }
-
-          if (event.type === "redraw") {
-            var delta = event.delta;
-            markerSprites.forEach(function (markerSprite) {
-              markerSprite.rotation -= 0.03 * delta;
-            });
-          } */
-            firstDraw = true;
-            prevZoom = zoom;
-            //renderiza o objeto para sobreposição
-            renderer.render(container);
-          },
-          pixiContainer,
-          {
-            doubleBuffering: doubleBuffering,
-          }
+            if (event.type === "redraw") {
+              var delta = event.delta;
+              markerSprites.forEach(function (markerSprite) {
+                markerSprite.rotation -= 0.03 * delta;
+              });
+            } */
+              firstDraw = true;
+              prevZoom = zoom;
+              //renderiza o objeto para sobreposição
+              renderer.render(container);
+            },
+            pixiContainer,
+            {
+              doubleBuffering: doubleBuffering,
+            }
         );
         //adiciona a sobreposição no mapa de referencia
         pixiOverlay.addTo(this.$refs.map.mapObject);
@@ -246,14 +248,17 @@ export default {
 h3 {
   margin: 40px 0 0;
 }
+
 ul {
   list-style-type: none;
   padding: 0;
 }
+
 li {
   display: inline-block;
   margin: 0 10px;
 }
+
 a {
   color: #42b983;
 }

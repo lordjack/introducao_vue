@@ -25,6 +25,9 @@
       >
         <l-tile-layer :url="url" :attribution="attribution" />
         <l-marker :lat-lng="withPopup">
+          <l-icon
+            icon-url="https://unpkg.com/leaflet@1.6.0/dist/images/marker-icon.png"
+          />
           <l-popup>
             <div @click="innerClick">
               I am a popup
@@ -37,6 +40,9 @@
           </l-popup>
         </l-marker>
         <l-marker :lat-lng="withTooltip">
+          <l-icon
+            icon-url="https://unpkg.com/leaflet@1.6.0/dist/images/marker-icon.png"
+          />
           <l-tooltip :options="{ permanent: true, interactive: true }">
             <div @click="innerClick">
               Eu sou um teste
@@ -56,7 +62,7 @@
 
 <script>
 import L, { latLng } from "leaflet";
-import { LMap, LTileLayer, LMarker, LPopup, LTooltip } from "vue2-leaflet";
+import { LMap, LTileLayer, LMarker, LIcon, LPopup, LTooltip } from "vue2-leaflet";
 import * as PIXI from "pixi.js";
 import "leaflet/dist/leaflet.css";
 import "leaflet-pixi-overlay";
@@ -70,12 +76,13 @@ export default {
     LMap,
     LTileLayer,
     LMarker,
+    LIcon,
     LPopup,
     LTooltip,
   },
   data() {
     return {
-      zoom: 13,
+      zoom: 8.5,
       center: latLng(47.41322, -1.219482),
       url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       attribution:
@@ -153,7 +160,7 @@ export default {
       //------------------------------------------------
 
       //carregador
-      var markersLength = 10;
+      var markersLength = 100;
       var loader = new PIXI.loaders.Loader();
       loader.add("marker", "https://pixijs.io/examples/examples/assets/bunny.png");
       loader.load((loader, resources) => {
@@ -185,44 +192,55 @@ chatContainer.addChild(settlement)
         //variaveis que serão as flags
         let firstDraw = true;
         let prevZoom;
+        var markerSprites = [];
         //    var initialScale;
+        var doubleBuffering =
+          /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
         //cria uma camada de sobrepossição
-        let pixiOverlay = L.pixiOverlay((utils) => {
-          let zoom = utils.getMap().getZoom();
-          let container = utils.getContainer();
-          let renderer = utils.getRenderer();
-          let project = utils.latLngToLayerPoint;
-          let scale = utils.getScale();
+        let pixiOverlay = L.pixiOverlay(
+          (utils) => {
+            let zoom = utils.getMap().getZoom();
+            let container = utils.getContainer();
+            let renderer = utils.getRenderer();
+            let project = utils.latLngToLayerPoint;
+            let scale = 1 / utils.getScale();
 
-          if (firstDraw) {
-            //seta as coordenadas ao marcador
-            /*     let markerCoords = project(markerLatLng);
+            if (firstDraw) {
+              //seta as coordenadas ao marcador
+              /*     let markerCoords = project(markerLatLng);
             marker.x = markerCoords.x;
             marker.y = markerCoords.y; 
-latLng(47.41322, -1.219482)
-*/
-
-            // var origin = project([(48.7 + 49) / 2, (2.2 + 2.8) / 2]);
-            for (var i = 0; i < markersLength; i++) {
-              var coords = project([getRandom(46.4, 49), getRandom(2.2, 2.8)]);
-              //  debugger;
-              const bunny = new PIXI.Sprite(markerTexture);
-              bunny.anchor.set(0.5);
-              /* bunny.x = coords.x - origin.x;
+            latLng(47.41322, -1.219482)
+            */
+              // var origin = project([(48.7 + 49) / 2, (2.2 + 2.8) / 2]);
+              for (var i = 0; i < markersLength; i++) {
+                var coords = project([getRandom(46.4, 49), getRandom(2.2, 2.8)]);
+                //  debugger;
+                const bunny = new PIXI.Sprite(markerTexture);
+                bunny.anchor.set(0.5);
+                bunny.scale.set(scale);
+                /* bunny.x = coords.x - origin.x;
               bunny.y = coords.y - origin.y; */
-              bunny.x = coords.x;
-              bunny.y = coords.y;
+                bunny.x = coords.x;
+                bunny.y = coords.y;
 
-              innerContainer.addChild(bunny);
+                innerContainer.addChild(bunny);
+                markerSprites.push(bunny);
+              }
             }
-          }
 
-          //definição da escala do marcador
-          if (firstDraw || prevZoom !== zoom) {
+            //definição da escala do marcador
+            /* if (firstDraw || prevZoom !== zoom) {
             marker.scale.set(1 / scale);
-          }
-          /*
+          } */
+            if (firstDraw || prevZoom !== zoom) {
+              markerSprites.forEach(function (markerSprite) {
+                markerSprite.scale.set(scale);
+              });
+              prevZoom = zoom;
+            }
+            /*
           debugger;
           if (event.type === "zoomanim") {
             var targetZoom = event.zoom;
@@ -256,11 +274,16 @@ latLng(47.41322, -1.219482)
             }
           } */
 
-          firstDraw = true;
-          prevZoom = zoom;
-          //renderiza o objeto para sobreposição
-          renderer.render(container);
-        }, pixiContainer);
+            firstDraw = true;
+            prevZoom = zoom;
+            //renderiza o objeto para sobreposição
+            renderer.render(container);
+          },
+          pixiContainer,
+          {
+            doubleBuffering: doubleBuffering,
+          }
+        );
         //adiciona a sobreposição no mapa de referencia
         pixiOverlay.addTo(this.$refs.map.mapObject);
       });
