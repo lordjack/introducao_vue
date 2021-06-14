@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    <h1>Olá 1 {{ msg }}</h1>
+    <h1>Olá {{ msg }}</h1>
 
     <div style="height: 500px; width: 100%">
       <div style="height: 200px; overflow: auto">
@@ -84,7 +84,6 @@ export default {
   data() {
     return {
       map: null,
-      pixiLoader: null,
       zoom: 13,
       center: latLng(51.509, -0.08),
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -165,7 +164,6 @@ export default {
   },
   async mounted() {
     try {
-      this.pixiLoader = new PIXI.loaders.Loader();
       await this.$nextTick(async () => {
         this.map = this.$refs.map.mapObject;
         this.draw();
