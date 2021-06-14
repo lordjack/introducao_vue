@@ -2,11 +2,12 @@ import Vue from "vue";
 import Router from "vue-router";
 import HelloWorld from "./components/HelloWorld.vue";
 import PixiOverlay from "./components/PixiOverlay.vue";
+import PixiOverlayBezierEasing from "./components/PixiOverlayBezierEasing.vue";
 //import PixiOverlayMarkers from "./components/PixiOverlayMarkers.vue";
 /* import PixiOverlayTeste2 from "./components/PixiOverlayTeste2.vue";
 import PixiOverlayTeste3 from "./components/PixiOverlayTeste3.vue"; */
 import PixiOverlayTeste4 from "./components/PixiOverlayTeste4.vue";
-//import PixiOverlayTeste5 from "./components/PixiOverlayTeste5.vue";
+import PixiOverlayTeste5 from "./components/PixiOverlayTeste5.vue";
 import PixiOverlayTeste6 from "./components/PixiOverlayTeste6.vue";
 import PixiOverlayTeste7 from "./components/PixiOverlayTeste7.vue";
 import PixiOverlayTeste8 from "./components/PixiOverlayTeste8.vue";
@@ -19,6 +20,11 @@ export default new Router({
             path: "/helloworld",
             name: "home",
             component: HelloWorld
+        },
+        {
+            path: "/PixiOverlayBezierEasing",
+            name: "bezier-easing",
+            component: PixiOverlayBezierEasing
         },
         /*   {
               path: "/PixiOverlayMarkers",
@@ -41,11 +47,11 @@ export default new Router({
             name: "pixioverlayteste4",
             component: PixiOverlayTeste4
         },
-        /*  {
+        {
              path: "/PixiOverlayTeste5",
              name: "pixioverlayteste5",
              component: PixiOverlayTeste5
-         }, */
+         },
         {
             path: "/PixiOverlayTeste6",
             name: "pixioverlayteste6",
