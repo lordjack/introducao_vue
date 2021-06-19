@@ -136,6 +136,19 @@ export default {
 
             if (firstDraw) {
               var geojson = topojson.feature(topo, topo.objects.usStates);
+               
+              // const url = 'http://sgeolayers.imd.ufrn.br/sgeol-geologia/v2/sub_bacias_pisf/find-by-zoom?lat=-7.90707&long=-37.34524&zoom=7&limit=1000&offset=0&prop=location&prop=name&prop=description&prop=color';
+
+              // const options = {
+              //    headers: { 
+              //  'user-token': 'ad72db12-63d6-472b-9070-6e2d7e433183', 
+              //  'application-token': '20d9bc48-2209-48cb-96b5-af7db299aa8e' 
+              //  } 
+              // };
+
+              // const { response } = axios.get(url, options)
+              
+              // response.forEach(function (feature) {
 
               geojson.features.forEach(function (feature) {
                 var alpha, color;
@@ -146,7 +159,9 @@ export default {
 
                 if (feature.geometry.type === "Polygon") {
                   drawPoly(color, alpha, container, project)(feature.geometry.coordinates);
+                  // feature.location.value.type
                 } else if (feature.geometry.type == "MultiPolygon") {
+                  // feature.location.value.coordinates.forEach(drawPoly(color, alpha, container, project));
                   feature.geometry.coordinates.forEach(drawPoly(color, alpha, container, project));
                 }
               });
