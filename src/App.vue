@@ -4,7 +4,9 @@
     <div id="nav">
       <router-link to="/helloworld">Início</router-link> |
       <router-link to="/pixioverlay"> Exemplo Pixi Overlay |</router-link>
-      <router-link to="/PixiOverlayBezierEasing"> Exemplo PixiOverlayBezierEasingy |</router-link>
+      <router-link to="/PixiOverlayBezierEasing">
+        Exemplo PixiOverlayBezierEasingy |</router-link
+      >
       <router-link to="/pixioverlayteste2"> Exemplo 02 - Pixi Overlay | </router-link>
       <router-link to="/PixiOverlayTeste3"> Exemplo 03 - Pixi Overlay | </router-link>
       <router-link to="/PixiOverlayTeste4"> Exemplo 04 - Pixi Overlay | </router-link>
@@ -12,6 +14,7 @@
       <router-link to="/PixiOverlayTeste6"> Exemplo 06 - Cidade | </router-link>
       <router-link to="/PixiOverlayTeste7"> Exemplo 07 - USA Markers | </router-link>
       <router-link to="/PixiOverlayTeste8"> Exemplo 08 - USA Polygonos| </router-link>
+      <router-link to="/PixiOverlayTeste9"> Exemplo 09 - Sgeol Polygonos| </router-link>
     </div>
     <router-view></router-view>
   </div>
