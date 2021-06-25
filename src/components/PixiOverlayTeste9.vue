@@ -116,22 +116,50 @@ export default {
       // const response = await axios.get("data/us.topojson");
       //   var topo = response.data;
       // const geojson = 'http://sgeolayers.imd.ufrn.br/sgeol-geologia/v2/sub_bacias_pisf/find-by-zoom?lat=-7.90707&long=-37.34524&zoom=7&limit=1000&offset=0&prop=location&prop=name&prop=description&prop=color';
-      const url =
-        "http://sgeolayers.imd.ufrn.br/sgeol-geologia/v2/sub_bacias_pisf/find-by-zoom?lat=-7.90707&long=-37.34524&zoom=6&limit=1000&prop=location";
+
+      /*   const url =
+        "http://sgeolayers.imd.ufrn.br/sgeol-geologia/v2/sub_bacias_pisf/find-by-zoom?lat=-7.90707&long=-37.34524&zoom=6&limit=30000&prop=location";
       const options = {
         headers: {
-          "application-token": "11b167e6-779a-452e-b499-038fa9270dcd",
-          "user-token": "3eb18ba7-5522-43f9-a120-1e77f98f2d94",
+          "application-token": "bf8f6ff0-d390-436d-8153-dd48dad58a2e",
+          "user-token": "c324dd82-58bd-41ea-9667-799cee18b034",
+        },
+      }; */
+      //---------------------------------------------------------------
+      //Exemplo carregando dados apenas uma vez - ok
+      /*     const url = `http://sgeolayers.imd.ufrn.br/sgeol-geologia/v2/balanco_hidrico?limit=1000&offset=1000`;
+      const options = {
+        headers: {
+          "application-token": "bf8f6ff0-d390-436d-8153-dd48dad58a2e",
+          "user-token": "c324dd82-58bd-41ea-9667-799cee18b034",
         },
       };
+      let response = await axios.get(url, options);
 
-      const response = await axios.get(url, options);
-      //  console.log(response);
-      //  console.log(response.data);
-      /*  response.data.forEach(function (itens) {
-        console.log(itens.location.value.type);
-        console.log(itens.location.value.coordinates);
-      }); */
+      let geojson = [];
+      geojson = response.data; */
+      //---------------------------------------------------------------
+
+      //Exemplo carregando mais de um dados por vez - ok
+      let geojson = [];
+      try {
+        for (let i = 1000; i <= 7000; i += 2000) {
+          const url = `http://sgeolayers.imd.ufrn.br/sgeol-geologia/v2/balanco_hidrico?limit=${i}&offset=${i}`;
+          const options = {
+            headers: {
+              "application-token": "bf8f6ff0-d390-436d-8153-dd48dad58a2e",
+              "user-token": "c324dd82-58bd-41ea-9667-799cee18b034",
+            },
+          };
+          let response = await axios.get(url, options);
+          await console.log(i);
+
+          geojson = geojson.concat(response.data);
+        }
+      } catch (error) {
+        console.log(Object.keys(error), error.message);
+      }
+      //   await console.log(geojson);
 
       //  loader.load((loader, resources) => {
       var firstDraw = true;
@@ -153,7 +181,7 @@ export default {
           if (firstDraw) {
             //carregador
             //   var geojson = topojson.feature(topo, topo.objects.usStates);
-            var geojson = response.data;
+
             // response.forEach(function (feature) {
             let that = this;
             geojson.forEach((feature) => {
@@ -163,7 +191,7 @@ export default {
               color = 256 * (tint.r * 256 + tint.g) + tint.b;
               alpha = 0.8;
               if (feature.location.value === null) return;
-              // console.log(feature.location.value);
+              // console.log(feature);
 
               if (feature.location.value.type === "Polygon") {
                 drawPoly(
@@ -172,9 +200,9 @@ export default {
                   container,
                   project
                 )(feature.location.value.coordinates);
-                // feature.location.value.type
+                // feature.type
               } else if (feature.location.value.type == "MultiPolygon") {
-                // feature.location.value.coordinates.forEach(drawPoly(color, alpha, container, project));
+                // feature.coordinates.forEach(drawPoly(color, alpha, container, project));
 
                 feature.location.value.coordinates.forEach(
                   drawPoly(color, alpha, container, project)
@@ -196,7 +224,7 @@ export default {
 
       function drawPoly(color, alpha, container, project) {
         return function (poly) {
-          console.log(poly);
+          //    console.log(poly);
           var shape = new PIXI.Polygon(
             poly[0].map(function (point) {
               var proj = project([point[1], point[0]]);
