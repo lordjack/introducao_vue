@@ -143,7 +143,7 @@ export default {
       //Exemplo carregando mais de um dados por vez - ok
       let geojson = [];
       try {
-        for (let i = 1000; i <= 7000; i += 2000) {
+        for (let i = 1000; i <= 7000; i += 1000) {
           const url = `http://sgeolayers.imd.ufrn.br/sgeol-geologia/v2/balanco_hidrico?limit=${i}&offset=${i}`;
           const options = {
             headers: {
