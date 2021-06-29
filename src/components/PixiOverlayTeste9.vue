@@ -143,12 +143,12 @@ export default {
       //Exemplo carregando mais de um dados por vez - ok
       let geojson = [];
       try {
-        for (let i = 1000; i <= 7000; i += 1000) {
-          const url = `http://sgeolayers.imd.ufrn.br/sgeol-geologia/v2/balanco_hidrico?limit=${i}&offset=${i}`;
+        for (let i = 1000; i <= 30000; i += 1000) {
+          const url = `http://sgeolayers.imd.ufrn.br/sgeol-geologia/v2/balanco_hidrico?limit=1000&offset=${i}`;
           const options = {
             headers: {
-              "application-token": "bf8f6ff0-d390-436d-8153-dd48dad58a2e",
-              "user-token": "c324dd82-58bd-41ea-9667-799cee18b034",
+              "application-token": "b9f791b8-4461-4bbc-8fe7-67fdcc211b3a",
+              "user-token": "f846bf82-0800-4961-ad17-c2d386dd59d2",
             },
           };
           let response = await axios.get(url, options);
