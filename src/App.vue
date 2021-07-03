@@ -16,7 +16,7 @@
       <router-link to="/PixiOverlayTeste8"> Exemplo 08 - USA Polygonos| </router-link>
       <router-link to="/PixiOverlayTeste9"> Exemplo 09 - Sgeol Polygonos| </router-link>
       <router-link to="/PixiOverlayTeste10"> Exemplo 10 - Sgeol Marcadores| </router-link>
-      <router-link to="/PixiOverlayTeste10">
+      <router-link to="/PixiOverlayTeste11">
         Exemplo 11 - Sgeol Marcadores 2|
       </router-link>
     </div>
