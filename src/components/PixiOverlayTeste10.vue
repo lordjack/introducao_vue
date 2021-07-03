@@ -134,8 +134,8 @@ export default {
       const url = `http://sgeolayers.imd.ufrn.br/sgeol-geologia/v2/rn_rural`;
       const options = {
         headers: {
-          "application-token": "81334d28-539c-4c6e-a875-ccf0ab83ad79",
-          "user-token": "d8fe7ae4-145f-49c9-9af7-beb38b8770d5",
+          "application-token": "fc4077ca-27c7-4aeb-a562-97ef6022181c",
+          "user-token": "f759f3c9-d2f4-4b3a-9f3d-a42cd007f163",
         },
       };
       let response = await axios.get(url, options);
@@ -235,10 +235,10 @@ export default {
                   ])
                   .setContent(markers[i].nome.value)
                   .openOn(vm.map);
-*/
+                */
                 markerSprites.push(markerSprite);
               }
-              utils.getMap().on("click", function (e) {
+              /*  utils.getMap().on("click", function (e) {
                 // not really nice but much better than before
                 // good starting point for improvements
                 var interaction = utils.getRenderer().plugins.interaction;
@@ -261,7 +261,7 @@ export default {
                   console.log("teste2");
                   target.popup.openOn(vm.map);
                 }
-              });
+              }); */
 
               /*  utils.getMap().on("click", function (e) {
                 // not really nice but much better than before
@@ -282,16 +282,17 @@ export default {
                   target.popup.openOn(vm.map);
                   console.log(interaction);
                 }
-              }); */
+              });
+                */
             }
-            /*  var quadTrees = {};
+            var quadTrees = {};
             for (var z = vm.map.getMinZoom(); z <= vm.map.getMaxZoom(); z++) {
               var rInit = (z <= 7 ? 16 : 24) / utils.getScale(z);
               // console.log(window);
               quadTrees[z] = solveCollision(markerSprites, { r0: rInit, zoom: z });
               // console.log(quadTrees);
-            } */
-            /*   function findMarker(ll) {
+            }
+            function findMarker(ll) {
               var layerPoint = project(ll);
               var quadTree = quadTrees[utils.getMap().getZoom()];
               // console.log(quadTree);
@@ -317,8 +318,8 @@ export default {
                 );
               });
               return marker;
-            } */
-            /*    vm.map.on("click", function (e) {
+            }
+            vm.map.on("click", function (e) {
               var redraw = false;
               if (focus) {
                 //    focus.texture = markerTexture[focus.textureIndex];
@@ -330,35 +331,34 @@ export default {
                 vm.legend = redraw = true;
               }
               console.log(e.latlng);
- */
 
-            //console.log("Qtd de Dados: " + markerSprites.length);
-            //  for (var i = 0; i < markers.length; i++) {
-            //     console.log(i);
-            //   markers.forEach(async function (item) {
-            /*    markerSprites[i].legend = markers[i].nome.value;
+              //console.log("Qtd de Dados: " + markerSprites.length);
+              //  for (var i = 0; i < markers.length; i++) {
+              //     console.log(i);
+              //   markers.forEach(async function (item) {
+              /*    markerSprites[i].legend = markers[i].nome.value;
                 markerSprites[i].latitude = markers[i].location.value.coordinates[0][1]; //latitude
                 markerSprites[i].longitude = markers[i].location.value.coordinates[0][0]; //longitude */
-            // console.log(item.legend);
-            //  console.log(item.latitude);
-            /*    console.log(markers[i].location.value.coordinates[0][1].toFixed(2));
+              // console.log(item.legend);
+              //  console.log(item.latitude);
+              /*    console.log(markers[i].location.value.coordinates[0][1].toFixed(2));
                 console.log(markers[i].location.value.coordinates[0][0].toFixed(2));
                 console.log(
                   parseFloat(markers[i].location.value.coordinates[0][1]).toFixed(2) ==
                     parseFloat(e.latlng.lat.toFixed(2))
                 ); */
-            //   debugger;
-            /*  if (item.latitude == e.latlng.lat && item.longitude == e.latlng.lng) {
+              //   debugger;
+              /*  if (item.latitude == e.latlng.lat && item.longitude == e.latlng.lng) {
                 console.log(item.legend);
                 console.log(item.longitude);
               } */
-            //    }
-            // vm.legend = markerSprites.legend;
-            //  console.log(vm.legend);
-            //  console.log(markerSprites);
+              // }
+              // vm.legend = markerSprites.legend;
+              //  console.log(vm.legend);
+              //  console.log(markerSprites);
 
-            // this.withPopup = e.latlng;
-            /*          var marker = findMarker(e.latlng);
+              // this.withPopup = e.latlng;
+              /*          var marker = findMarker(e.latlng);
               //var marker = e.latlng;
               if (marker) {
                 // marker.texture = markerTexture[marker.textureIndex];
@@ -369,7 +369,7 @@ export default {
                 redraw = true;
               }
               if (redraw) utils.getRenderer().render(container); */
-            //  });
+            });
 
             /*   vm.map.on(
               "mousemove",
@@ -412,42 +412,6 @@ export default {
               });*/
             }
 
-            //   debugger;
-            /*      if (event?.type === "add") {
-              markers.forEach(function (marker) {
-                var coords = project([
-                  marker.location.value.coordinates[0][1],
-                  marker.location.value.coordinates[0][0],
-                ]);
-                //  console.log(coords);
-                ///  var coords = project([marker.latitude, marker.longitude]);
-                var index = Math.floor(Math.random() * markerTexture.length);
-                var markerSprite = new PIXI.Sprite(markerTexture[index]);
-                markerSprite.textureIndex = index;
-                markerSprite.x = coords.x;
-                markerSprite.y = coords.y;
-                markerSprite.anchor.set(0.5, 0.5);
-                markerSprite.scale.set(scale);
-                // var tint = d3.color(scale(Math.random() * 100)).rgb();
-                // markerSprite.tint = 256 * (tint.r * 256 + tint.g) + tint.b;
-                container.addChild(markerSprite);
-                markerSprites.push(markerSprite);
-              });
-            } */
-
-            /*      if (event.type === "moveend" && prevZoom !== zoom) {
-              markerSprites.forEach(function (markerSprite) {
-                markerSprite.scale.set(scale);
-              });
-              prevZoom = zoom;
-            }
-
-            if (event.type === "redraw") {
-              var delta = event.delta;
-              markerSprites.forEach(function (markerSprite) {
-                markerSprite.rotation -= 0.03 * delta;
-              });
-            } */
             firstDraw = false;
             prevZoom = zoom;
             //renderiza o objeto para sobreposição
@@ -461,16 +425,7 @@ export default {
         //adiciona a sobreposição no mapa de referencia
         // pixiOverlay.addTo(this.$refs.map.mapObject);
         pixiOverlay.addTo(vm.map);
-
-        /*      var ticker = new PIXI.ticker.Ticker();
-        ticker.add(function (delta) {
-          pixiOverlay.redraw({ type: "redraw", delta: delta });
-        });
-        ticker.start(); */
       });
-      /*  function getRandom(min, max) {
-        return min + Math.random() * (max - min);
-      } */
 
       function solveCollision(t, e) {
         e = e || {};
