@@ -93,7 +93,8 @@ export default {
   },
   data() {
     return {
-      zoom: 8,
+      markers: [],
+      zoom: 2,
       center: latLng(-6.031311, -35.996704),
       url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       attribution:
@@ -104,7 +105,7 @@ export default {
       currentCenter: latLng(-6.031311, -35.996704),
       showParagraph: false,
       mapOptions: {
-        zoomSnap: 0.0,
+        zoomSnap: 1,
       },
       showMap: true,
       map: null,
@@ -127,6 +128,7 @@ export default {
 
     async draw() {
       //carregador
+      console.log('loading');
       var loader = new PIXI.loaders.Loader();
       loader
         .add("plane", "img/plane.png")
@@ -138,7 +140,8 @@ export default {
 
       //  const response = await axios.get("data/cities.json");
 
-      const url = `http://sgeolayers.imd.ufrn.br/sgeol-geologia/v2/rn_rural`;
+      const url = `https://raw.githubusercontent.com/manubb/Leaflet.PixiOverlay/master/docs/data/cities.json`;
+      // const url = `http://sgeolayers.imd.ufrn.br/sgeol-geologia/v2/rn_rural`;
       const options = {
         headers: {
           "application-token": "fc4077ca-27c7-4aeb-a562-97ef6022181c",
@@ -148,6 +151,7 @@ export default {
       let response = await axios.get(url, options);
 
       var markers = response.data;
+
       // markers.forEach((element) => {
       //console.log(element.location);
       // });
@@ -194,8 +198,6 @@ export default {
           resources.focusBicycle.texture,
         ];
 
-        vm.map.attributionControl.setPosition("bottomleft");
-        vm.map.zoomControl.setPosition("bottomright");
         var legend = document.querySelector("div.legend.geometry");
         var legendContent = legend.querySelector(".content");
 
@@ -216,163 +218,138 @@ export default {
           /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
         //cria uma camada de sobrepossição
-        let pixiOverlay = L.pixiOverlay(
-          (utils) => {
-            var zoom = utils.getMap().getZoom();
-            if (frame) {
-              cancelAnimationFrame(frame);
-              frame = null;
-            }
-            var container = utils.getContainer();
-            var renderer = utils.getRenderer();
-            var project = utils.latLngToLayerPoint;
-            var scale = utils.getScale();
-            var invScale = 1 / scale;
+        var pixiLayer = (() => {
+					var firstDraw = true;
+					var prevZoom;
+					var markerSprites = [];
+					var colorScale = d3.scaleLinear()
+						.domain([0, 50, 100])
+						.range(["#c6233c", "#ffd300", "#008000"]);
 
-            if (firstDraw) {
-              markers.forEach((marker) => {
-                //   for (var i = 0; i < markers.length; i++) {
-                var coords = project([
-                  marker.location.value.coordinates[0][1], //latitude
-                  marker.location.value.coordinates[0][0], //longitude
-                ]);
-                //  console.log(marker);
-                //  debugger;
-                //objeto marcador
-                var index = Math.floor(Math.random() * textures.length);
-                var markerSprite = new PIXI.Sprite(textures[index]);
-                markerSprite.textureIndex = index;
-                markerSprite.x0 = coords.x;
-                markerSprite.y0 = coords.y;
-                markerSprite.anchor.set(0.5, 0.5);
-                var tint = d3
-                  // .color(colorScale(marker.avancement || Math.random() * 100))
-                  .color(colorScale(Math.random() * 100))
-                  .rgb();
-                markerSprite.tint = 256 * (tint.r * 256 + tint.g) + tint.b;
-                container.addChild(markerSprite);
-                markerSprites.push(markerSprite);
-                markerSprite.legend = marker.city || marker.label;
+					var frame = null;
+					var focus = null;
+					var pixiContainer = new PIXI.Container();
+					var doubleBuffering = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-                //   let legenda = markers[i].nome.value;
-                //  markerSprite.legend = markers[i].nome.value;
-              });
-              var quadTrees = {};
-              for (var z = vm.map.getMinZoom(); z <= vm.map.getMaxZoom(); z++) {
-                var rInit = (z <= 7 ? 16 : 24) / utils.getScale(z);
-                quadTrees[z] = window.solveCollision(markerSprites, {
-                  r0: rInit,
-                  zoom: z,
-                });
-              }
+          const vm = this;
+					return L.pixiOverlay(function(utils) {
+						var zoom = utils.getMap().getZoom();
+						if (frame) {
+							cancelAnimationFrame(frame);
+							frame = null;
+						}
+						var container = utils.getContainer();
+						var renderer = utils.getRenderer();
+						var project = utils.latLngToLayerPoint;
+						var scale = utils.getScale();
+						var invScale = 1 / scale;
+						if (firstDraw) {
+							prevZoom = zoom;
+							markers.forEach(function(marker) {
+								var coords = project([marker.latitude, marker.longitude]);
+								var index = Math.floor(Math.random() * textures.length);
+								var markerSprite = new PIXI.Sprite(textures[index]);
+								markerSprite.textureIndex = index;
+								markerSprite.x0 = coords.x;
+								markerSprite.y0 = coords.y;
+								markerSprite.anchor.set(0.5, 0.5);
+								var tint = d3.color(colorScale(marker.avancement || Math.random() * 100)).rgb();
+								markerSprite.tint = 256 * (tint.r * 256 + tint.g) + tint.b;
+								container.addChild(markerSprite);
+								markerSprites.push(markerSprite);
+								markerSprite.legend = marker.city || marker.label;
+							});
+							var quadTrees = {};
+							for (var z = vm.map.getMinZoom(); z <= vm.map.getMaxZoom(); z++) {
+								var rInit = ((z <= 7) ? 16 : 24) / utils.getScale(z);
+								quadTrees[z] = window.solveCollision(markerSprites, {r0: rInit, zoom: z});
+							}
+							
+							vm.map.on('click', function(e) {
+								var redraw = false;
+								if (focus) {
+									focus.texture = textures[focus.textureIndex];
+									focus = null;
+									L.DomUtil.addClass(legend, 'hide');
+									legendContent.innerHTML = '';
+									redraw = true;
+								}
+								var marker = findMarker(e.latlng, quadTrees, utils);
+								if (marker) {
+									marker.texture = focusTextures[marker.textureIndex];
+									focus = marker;
+									legendContent.innerHTML = marker.legend;
+									L.DomUtil.removeClass(legend, 'hide');
+									redraw = true;
+								}
+								if (redraw) utils.getRenderer().render(container);
+							});
 
-              // eslint-disable-next-line no-debugger
-              //debugger;
-              vm.map.on("click", function (e) {
-                var redraw = false;
-                if (focus) {
-                  focus.texture = textures[focus.textureIndex];
-                  focus = null;
-                  L.DomUtil.addClass(legend, "hide");
-                  legendContent.innerHTML = "";
-                  redraw = true;
-                }
-                var marker = findMarker(e.latlng, quadTrees, utils);
-                if (marker) {
-                  marker.texture = focusTextures[marker.textureIndex];
-                  focus = marker;
-                  legendContent.innerHTML = marker.legend;
-                  L.DomUtil.removeClass(legend, "hide");
-                  redraw = true;
-                }
-                if (redraw) utils.getRenderer().render(container);
-              });
-              //var self = this;
-              vm.map.on(
-                "mousemove",
-                L.Util.throttle(function (e) {
-                  var marker = findMarker(e.latlng, quadTrees, utils);
-                  if (marker) {
-                    console.log("Teste1");
-                    //  L.DomUtil.addClass(self._container, "leaflet-interactive");
-                  } else {
-                    console.log("Teste2");
-                    //L.DomUtil.removeClass(self._container, "leaflet-interactive");
-                  }
-                }, 32)
-              );
-            }
+							var self = this;
+							vm.map.on('mousemove', L.Util.throttle(function(e) {
+								var marker = findMarker(e.latlng, quadTrees, utils);
+								if (marker) {
+									// L.DomUtil.addClass(self._container, 'leaflet-interactive');
+								} else {
+									// L.DomUtil.removeClass(self._container, 'leaflet-interactive');
+								}
+							}, 32));
+						}
 
-            //definição da escala do marcador
-            if (firstDraw || prevZoom !== zoom) {
-              /*
-                Esta dando erro no Position
-                */
-              markerSprites.forEach((markerSprite) => {
-                var position = markerSprite.cache[zoom]
-                  ? markerSprite.cache[zoom]
-                  : utils.getMap().getZoom();
-                console.log(position);
-                if (firstDraw) {
-                  markerSprite.x = position?.x;
-                  markerSprite.y = position?.y;
-                  markerSprite.scale.set(
-                    position?.r * scale < 16 ? position?.r / 16 : invScale
-                  );
-                } else {
-                  markerSprite.currentX = markerSprite.x;
-                  markerSprite.currentY = markerSprite.y;
-                  markerSprite.targetX = position?.x;
-                  markerSprite.targetY = position?.y;
-                  markerSprite.currentScale = markerSprite.scale.x;
-                  markerSprite.targetScale =
-                    position?.r * scale < 16 ? position?.r / 16 : invScale;
-                }
-              });
-            }
+						if (firstDraw || prevZoom !== zoom) {
+              console.log('zoom', zoom)
+							markerSprites.forEach(function(markerSprite) {
+								var position = markerSprite.cache[zoom];
+								if (firstDraw) {
+									markerSprite.x = position.x;
+									markerSprite.y = position.y;
+									markerSprite.scale.set((position.r * scale < 16) ? position.r / 16 : invScale);
+								} else {
+                  console.log(markerSprite, position);
+									markerSprite.currentX = markerSprite.x0;
+									markerSprite.currentY = markerSprite.y0;
+									markerSprite.targetX = position.x;
+									markerSprite.targetY = position.y;
+									markerSprite.currentScale = markerSprite.scale.x;
+									markerSprite.targetScale = (position.r * scale < 16) ? position.r / 16 : invScale;
+								}
+							});
+						}
 
-            //   debugger;
-            var start = null;
-            var delta = 250;
-            function animate(timestamp) {
-              var progress;
-              if (start === null) start = timestamp;
+						var start = null;
+						var delta = 250;
+
+            function animate (timestamp) {
+              let progress;
+              if (start === null) { start = timestamp; }
               progress = timestamp - start;
-              var lambda = progress / delta;
+              let lambda = progress / delta;
               if (lambda > 1) lambda = 1;
               lambda = lambda * (0.4 + lambda * (2.2 + lambda * -1.6));
-              markerSprites.forEach(function (markerSprite) {
-                markerSprite.x =
-                  markerSprite.currentX +
-                  lambda * (markerSprite.targetX - markerSprite.currentX);
-                markerSprite.y =
-                  markerSprite.currentY +
-                  lambda * (markerSprite.targetY - markerSprite.currentY);
-                markerSprite.scale.set(
-                  markerSprite.currentScale +
-                    lambda * (markerSprite.targetScale - markerSprite.currentScale)
-                );
+              markerSprites.forEach(function(markerSprite) {
+                markerSprite.x = markerSprite.currentX + lambda * (markerSprite.targetX - markerSprite.currentX);
+                markerSprite.y = markerSprite.currentY + lambda * (markerSprite.targetY - markerSprite.currentY);
+                markerSprite.scale.set(markerSprite.currentScale + lambda * (markerSprite.targetScale - markerSprite.currentScale));
               });
               renderer.render(container);
               if (progress < delta) {
+              frame = requestAnimationFrame(animate);
+              }
+              }
+
+              if (!firstDraw && prevZoom !== zoom) {
                 frame = requestAnimationFrame(animate);
               }
-            }
-            if (!firstDraw && prevZoom !== zoom) {
-              frame = requestAnimationFrame(animate);
-            }
-            firstDraw = false;
-            prevZoom = zoom;
-            renderer.render(container);
-          },
-          pixiContainer,
-          {
-            doubleBuffering: doubleBuffering,
-            destroyInteractionManager: true,
-          }
-        );
-        //adiciona a sobreposição no mapa de referencia
-        pixiOverlay.addTo(vm.map);
+              firstDraw = false;
+              prevZoom = zoom;
+              renderer.render(container);
+					}, pixiContainer, {
+						doubleBuffering: doubleBuffering,
+						destroyInteractionManager: true
+					});
+				})();
+
+        pixiLayer.addTo(vm.map);
       });
     },
   },
@@ -381,7 +358,10 @@ export default {
       this.map = this.$refs.map.mapObject; // work as expected
     });
 
-    this.draw();
+    setTimeout(() => {
+      this.draw();
+    }, 2000)
+
   },
 };
 </script>
