@@ -1,26 +1,15 @@
 <template>
   <div class="hello">
-    <h1>Olá {{ msg }}</h1>
-
-    <div style="height: 500px; width: 100%">
-      <div style="height: 200px; overflow: auto">
-        <h1>
-          teste11 - SGeol Marcadores
-          <!-- {{  pOverlay */ }} -->
-        </h1>
+    <div style="height: 800px; width: 100%">
+      <div style="height: 205px; overflow: auto">
+        <h1>teste11 - SGeol Marcadores</h1>
         <div class="legend geometry top center hide">
           <div class="wrapper">
-            <div class="content">
-              Sou uma legenda: {{ legend }}
-              <div @click="innerClick">Eu sou um popup</div>
-              Nome Item:{{ withPopup.lat }}
-            </div>
+            <div class="content"></div>
           </div>
         </div>
         <p>Marcação lugar no Mapa {{ withPopup.lat }}, {{ withPopup.lng }}</p>
         <p>Centro {{ currentCenter }} o zoom é: {{ currentZoom }}</p>
-        <button @click="showLongText">Teste</button>
-        <button @click="showMap = !showMap">Mostrar/Ocutar</button>
       </div>
       <l-map
         ref="map"
@@ -33,32 +22,6 @@
         @update:zoom="zoomUpdate"
       >
         <l-tile-layer :url="url" :attribution="attribution" />
-        <l-marker :lat-lng="withPopup">
-          <l-icon icon-url="https://pixijs.io/examples/examples/assets/bunny.png" />
-          <l-popup>
-            <div @click="innerClick">
-              Eu sou um popup
-              <p v-show="showParagraph">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sed
-                pretium nisl, ut sagittis sapien. Sed vel sollicitudin nisi. Donec finibus
-                semper metus id malesuada.
-              </p>
-            </div>
-          </l-popup>
-        </l-marker>
-        <l-marker :lat-lng="withTooltip">
-          <l-icon icon-url="https://pixijs.io/examples/examples/assets/bunny.png" />
-          <l-tooltip :options="{ permanent: true, interactive: true }">
-            <div @click="innerClick">
-              Eu sou um teste
-              <p v-show="showParagraph">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sed
-                pretium nisl, ut sagittis sapien. Sed vel sollicitudin nisi. Donec finibus
-                semper metus id malesuada.
-              </p>
-            </div>
-          </l-tooltip>
-        </l-marker>
       </l-map>
     </div>
     <router-view></router-view>
@@ -67,7 +30,7 @@
 
 <script>
 import L, { latLng /* icon */ } from "leaflet";
-import { LMap, LTileLayer, LMarker, LIcon, LPopup, LTooltip } from "vue2-leaflet";
+import { LMap, LTileLayer } from "vue2-leaflet";
 import * as PIXI from "pixi.js";
 import "leaflet/dist/leaflet.css";
 import "leaflet-pixi-overlay";
@@ -86,23 +49,19 @@ export default {
   components: {
     LMap,
     LTileLayer,
-    LMarker,
-    LIcon,
-    LPopup,
-    LTooltip,
   },
   data() {
     return {
       markers: [],
-      zoom: 2,
-      center: latLng(-6.031311, -35.996704),
+      zoom: 8,
+      center: latLng(-5.769036, -36.150513),
       url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       attribution:
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       withPopup: latLng(-5.18965, -36.10126),
       withTooltip: latLng(-5.58965, -36.11126),
-      currentZoom: 11.5,
-      currentCenter: latLng(-6.031311, -35.996704),
+      currentZoom: 8,
+      currentCenter: latLng(-5.769036, -36.150513),
       showParagraph: false,
       mapOptions: {
         zoomSnap: 1,
@@ -128,7 +87,7 @@ export default {
 
     async draw() {
       //carregador
-      console.log('loading');
+      console.log("loading");
       var loader = new PIXI.loaders.Loader();
       loader
         .add("plane", "img/plane.png")
@@ -138,14 +97,14 @@ export default {
         .add("bicycle", "img/bicycle.png")
         .add("focusBicycle", "img/focus-bicycle.png");
 
-      //  const response = await axios.get("data/cities.json");
+      //  const url = await axios.get("data/cities.json");
 
-      const url = `https://raw.githubusercontent.com/manubb/Leaflet.PixiOverlay/master/docs/data/cities.json`;
-      // const url = `http://sgeolayers.imd.ufrn.br/sgeol-geologia/v2/rn_rural`;
+      //const url = `https://raw.githubusercontent.com/manubb/Leaflet.PixiOverlay/master/docs/data/cities.json`;
+      const url = `http://sgeolayers.imd.ufrn.br/sgeol-geologia/v2/rn_rural`;
       const options = {
         headers: {
-          "application-token": "fc4077ca-27c7-4aeb-a562-97ef6022181c",
-          "user-token": "f759f3c9-d2f4-4b3a-9f3d-a42cd007f163",
+          "application-token": "b7e46726-d5f9-4e75-adbf-3c7dc5917450",
+          "user-token": "c9c29b93-08d0-4193-a64e-33f78efff5f1",
         },
       };
       let response = await axios.get(url, options);
@@ -219,122 +178,151 @@ export default {
 
         //cria uma camada de sobrepossição
         var pixiLayer = (() => {
-					var firstDraw = true;
-					var prevZoom;
-					var markerSprites = [];
-					var colorScale = d3.scaleLinear()
-						.domain([0, 50, 100])
-						.range(["#c6233c", "#ffd300", "#008000"]);
+          var firstDraw = true;
+          var prevZoom;
+          var markerSprites = [];
+          var colorScale = d3
+            .scaleLinear()
+            .domain([0, 50, 100])
+            .range(["#c6233c", "#ffd300", "#008000"]);
 
-					var frame = null;
-					var focus = null;
-					var pixiContainer = new PIXI.Container();
-					var doubleBuffering = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+          var frame = null;
+          var focus = null;
+          var pixiContainer = new PIXI.Container();
+          var doubleBuffering =
+            /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
           const vm = this;
-					return L.pixiOverlay(function(utils) {
-						var zoom = utils.getMap().getZoom();
-						if (frame) {
-							cancelAnimationFrame(frame);
-							frame = null;
-						}
-						var container = utils.getContainer();
-						var renderer = utils.getRenderer();
-						var project = utils.latLngToLayerPoint;
-						var scale = utils.getScale();
-						var invScale = 1 / scale;
-						if (firstDraw) {
-							prevZoom = zoom;
-							markers.forEach(function(marker) {
-								var coords = project([marker.latitude, marker.longitude]);
-								var index = Math.floor(Math.random() * textures.length);
-								var markerSprite = new PIXI.Sprite(textures[index]);
-								markerSprite.textureIndex = index;
-								markerSprite.x0 = coords.x;
-								markerSprite.y0 = coords.y;
-								markerSprite.anchor.set(0.5, 0.5);
-								var tint = d3.color(colorScale(marker.avancement || Math.random() * 100)).rgb();
-								markerSprite.tint = 256 * (tint.r * 256 + tint.g) + tint.b;
-								container.addChild(markerSprite);
-								markerSprites.push(markerSprite);
-								markerSprite.legend = marker.city || marker.label;
-							});
-							var quadTrees = {};
-							for (var z = vm.map.getMinZoom(); z <= vm.map.getMaxZoom(); z++) {
-								var rInit = ((z <= 7) ? 16 : 24) / utils.getScale(z);
-								quadTrees[z] = window.solveCollision(markerSprites, {r0: rInit, zoom: z});
-							}
-							
-							vm.map.on('click', function(e) {
-								var redraw = false;
-								if (focus) {
-									focus.texture = textures[focus.textureIndex];
-									focus = null;
-									L.DomUtil.addClass(legend, 'hide');
-									legendContent.innerHTML = '';
-									redraw = true;
-								}
-								var marker = findMarker(e.latlng, quadTrees, utils);
-								if (marker) {
-									marker.texture = focusTextures[marker.textureIndex];
-									focus = marker;
-									legendContent.innerHTML = marker.legend;
-									L.DomUtil.removeClass(legend, 'hide');
-									redraw = true;
-								}
-								if (redraw) utils.getRenderer().render(container);
-							});
-
-							var self = this;
-							vm.map.on('mousemove', L.Util.throttle(function(e) {
-								var marker = findMarker(e.latlng, quadTrees, utils);
-								if (marker) {
-									// L.DomUtil.addClass(self._container, 'leaflet-interactive');
-								} else {
-									// L.DomUtil.removeClass(self._container, 'leaflet-interactive');
-								}
-							}, 32));
-						}
-
-						if (firstDraw || prevZoom !== zoom) {
-              console.log('zoom', zoom)
-							markerSprites.forEach(function(markerSprite) {
-								var position = markerSprite.cache[zoom];
-								if (firstDraw) {
-									markerSprite.x = position.x;
-									markerSprite.y = position.y;
-									markerSprite.scale.set((position.r * scale < 16) ? position.r / 16 : invScale);
-								} else {
-                  console.log(markerSprite, position);
-									markerSprite.currentX = markerSprite.x0;
-									markerSprite.currentY = markerSprite.y0;
-									markerSprite.targetX = position.x;
-									markerSprite.targetY = position.y;
-									markerSprite.currentScale = markerSprite.scale.x;
-									markerSprite.targetScale = (position.r * scale < 16) ? position.r / 16 : invScale;
-								}
-							});
-						}
-
-						var start = null;
-						var delta = 250;
-
-            function animate (timestamp) {
-              let progress;
-              if (start === null) { start = timestamp; }
-              progress = timestamp - start;
-              let lambda = progress / delta;
-              if (lambda > 1) lambda = 1;
-              lambda = lambda * (0.4 + lambda * (2.2 + lambda * -1.6));
-              markerSprites.forEach(function(markerSprite) {
-                markerSprite.x = markerSprite.currentX + lambda * (markerSprite.targetX - markerSprite.currentX);
-                markerSprite.y = markerSprite.currentY + lambda * (markerSprite.targetY - markerSprite.currentY);
-                markerSprite.scale.set(markerSprite.currentScale + lambda * (markerSprite.targetScale - markerSprite.currentScale));
-              });
-              renderer.render(container);
-              if (progress < delta) {
-              frame = requestAnimationFrame(animate);
+          return L.pixiOverlay(
+            function (utils) {
+              var zoom = utils.getMap().getZoom();
+              if (frame) {
+                cancelAnimationFrame(frame);
+                frame = null;
               }
+              var container = utils.getContainer();
+              var renderer = utils.getRenderer();
+              var project = utils.latLngToLayerPoint;
+              var scale = utils.getScale();
+              var invScale = 1 / scale;
+              if (firstDraw) {
+                prevZoom = zoom;
+                markers.forEach(function (marker) {
+                  //     console.log(marker);
+                  // var coords = project([marker.latitude, marker.longitude]);
+                  var coords = project([
+                    marker.location.value.coordinates[0][1], //latitude
+                    marker.location.value.coordinates[0][0], //longitude
+                  ]);
+                  var index = Math.floor(Math.random() * textures.length);
+                  var markerSprite = new PIXI.Sprite(textures[index]);
+                  markerSprite.textureIndex = index;
+                  markerSprite.x0 = coords.x;
+                  markerSprite.y0 = coords.y;
+                  markerSprite.anchor.set(0.5, 0.5);
+                  var tint = d3
+                    .color(colorScale(marker.avancement || Math.random() * 100))
+                    .rgb();
+                  markerSprite.tint = 256 * (tint.r * 256 + tint.g) + tint.b;
+                  container.addChild(markerSprite);
+                  markerSprites.push(markerSprite);
+                  // markerSprite.legend = marker.city || marker.label;
+                  markerSprite.legend = marker.nome.value;
+                });
+                var quadTrees = {};
+                for (var z = vm.map.getMinZoom(); z <= vm.map.getMaxZoom(); z++) {
+                  var rInit = (z <= 7 ? 16 : 24) / utils.getScale(z);
+                  quadTrees[z] = window.solveCollision(markerSprites, {
+                    r0: rInit,
+                    zoom: z,
+                  });
+                }
+
+                vm.map.on("click", function (e) {
+                  var redraw = false;
+                  if (focus) {
+                    focus.texture = textures[focus.textureIndex];
+                    focus = null;
+                    L.DomUtil.addClass(legend, "hide");
+                    legendContent.innerHTML = "";
+                    redraw = true;
+                  }
+                  var marker = findMarker(e.latlng, quadTrees, utils);
+                  if (marker) {
+                    marker.texture = focusTextures[marker.textureIndex];
+                    focus = marker;
+                    legendContent.innerHTML = marker.legend;
+                    L.DomUtil.removeClass(legend, "hide");
+                    redraw = true;
+                  }
+                  if (redraw) utils.getRenderer().render(container);
+                });
+
+                var self = this;
+                vm.map.on(
+                  "mousemove",
+                  L.Util.throttle(function (e) {
+                    var marker = findMarker(e.latlng, quadTrees, utils);
+                    if (marker) {
+                      // L.DomUtil.addClass(self._container, 'leaflet-interactive');
+                    } else {
+                      // L.DomUtil.removeClass(self._container, 'leaflet-interactive');
+                    }
+                  }, 32)
+                );
+              }
+
+              if (firstDraw || prevZoom !== zoom) {
+                //   console.log("zoom", zoom);
+                markerSprites.forEach(function (markerSprite) {
+                  var position = markerSprite.cache[zoom];
+                  if (firstDraw) {
+                    markerSprite.x = position.x;
+                    markerSprite.y = position.y;
+                    markerSprite.scale.set(
+                      position.r * scale < 16 ? position.r / 16 : invScale
+                    );
+                  } else {
+                    //    console.log(markerSprite, position);
+                    markerSprite.currentX = markerSprite.x0;
+                    markerSprite.currentY = markerSprite.y0;
+                    markerSprite.targetX = position.x;
+                    markerSprite.targetY = position.y;
+                    markerSprite.currentScale = markerSprite.scale.x;
+                    markerSprite.targetScale =
+                      position.r * scale < 16 ? position.r / 16 : invScale;
+                  }
+                });
+              }
+
+              var start = null;
+              var delta = 250;
+
+              function animate(timestamp) {
+                let progress;
+                if (start === null) {
+                  start = timestamp;
+                }
+                progress = timestamp - start;
+                let lambda = progress / delta;
+                if (lambda > 1) lambda = 1;
+                lambda = lambda * (0.4 + lambda * (2.2 + lambda * -1.6));
+                markerSprites.forEach(function (markerSprite) {
+                  markerSprite.x =
+                    markerSprite.currentX +
+                    lambda * (markerSprite.targetX - markerSprite.currentX);
+                  markerSprite.y =
+                    markerSprite.currentY +
+                    lambda * (markerSprite.targetY - markerSprite.currentY);
+                  markerSprite.scale.set(
+                    markerSprite.currentScale +
+                      lambda * (markerSprite.targetScale - markerSprite.currentScale)
+                  );
+                });
+                renderer.render(container);
+                if (progress < delta) {
+                  frame = requestAnimationFrame(animate);
+                }
               }
 
               if (!firstDraw && prevZoom !== zoom) {
@@ -343,11 +331,14 @@ export default {
               firstDraw = false;
               prevZoom = zoom;
               renderer.render(container);
-					}, pixiContainer, {
-						doubleBuffering: doubleBuffering,
-						destroyInteractionManager: true
-					});
-				})();
+            },
+            pixiContainer,
+            {
+              doubleBuffering: doubleBuffering,
+              destroyInteractionManager: true,
+            }
+          );
+        })();
 
         pixiLayer.addTo(vm.map);
       });
@@ -360,8 +351,7 @@ export default {
 
     setTimeout(() => {
       this.draw();
-    }, 2000)
-
+    }, 2000);
   },
 };
 </script>
