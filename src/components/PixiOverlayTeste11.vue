@@ -103,8 +103,8 @@ export default {
       const url = `http://sgeolayers.imd.ufrn.br/sgeol-geologia/v2/rn_rural`;
       const options = {
         headers: {
-          "application-token": "b7e46726-d5f9-4e75-adbf-3c7dc5917450",
-          "user-token": "c9c29b93-08d0-4193-a64e-33f78efff5f1",
+          "application-token": "477041f3-23f6-42f1-ade0-8285a4384ecb",
+          "user-token": "c86f011b-5072-4916-97d4-2eac09dc183d",
         },
       };
       let response = await axios.get(url, options);

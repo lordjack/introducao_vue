@@ -147,8 +147,8 @@ export default {
           const url = `http://sgeolayers.imd.ufrn.br/sgeol-geologia/v2/balanco_hidrico?limit=1000&offset=${i}`;
           const options = {
             headers: {
-              "application-token": "fc4077ca-27c7-4aeb-a562-97ef6022181c",
-              "user-token": "f759f3c9-d2f4-4b3a-9f3d-a42cd007f163",
+              "application-token": "477041f3-23f6-42f1-ade0-8285a4384ecb",
+              "user-token": "c86f011b-5072-4916-97d4-2eac09dc183d",
             },
           };
           let response = await axios.get(url, options);
@@ -185,6 +185,7 @@ export default {
             // response.forEach(function (feature) {
             let that = this;
             geojson.forEach((feature) => {
+              console.log(feature);
               // geojson.features.forEach((feature) => {
               var alpha, color;
               var tint = d3.color(colorScale(Math.random() * 100)).rgb();

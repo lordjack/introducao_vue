@@ -17,7 +17,10 @@
       <router-link to="/PixiOverlayTeste9"> Exemplo 09 - Sgeol Polygonos| </router-link>
       <router-link to="/PixiOverlayTeste10"> Exemplo 10 - Sgeol Marcadores| </router-link>
       <router-link to="/PixiOverlayTeste11">
-        Exemplo 11 - Sgeol Marcadores 2|
+        Exemplo 11 - SGeol Marcadores 2|
+      </router-link>
+      <router-link to="/PixiOverlayTeste12">
+        Exemplo 12 - SGeol Poligonos com Labels|
       </router-link>
     </div>
     <router-view></router-view>
