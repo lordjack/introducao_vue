@@ -397,7 +397,7 @@ export default {
           /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         var mesh, circMesh;
         return L.pixiOverlay(
-          (utils) => {
+          function (utils) {
             var zoom = utils.getMap().getZoom();
             var container = utils.getContainer();
             var renderer = utils.getRenderer();
