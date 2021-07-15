@@ -103,8 +103,8 @@ export default {
       const url = `http://sgeolayers.imd.ufrn.br/sgeol-geologia/v2/rn_rural`;
       const options = {
         headers: {
-          "application-token": "477041f3-23f6-42f1-ade0-8285a4384ecb",
-          "user-token": "c86f011b-5072-4916-97d4-2eac09dc183d",
+          "application-token": "f51bfe8d-627a-4af6-bc4d-d0f73044f248",
+          "user-token": "89a933ad-3b22-4ae9-8440-4ee6631d751a",
         },
       };
       let response = await axios.get(url, options);
@@ -208,7 +208,7 @@ export default {
               if (firstDraw) {
                 prevZoom = zoom;
                 markers.forEach(function (marker) {
-                  //     console.log(marker);
+                  console.log(marker);
                   // var coords = project([marker.latitude, marker.longitude]);
                   var coords = project([
                     marker.location.value.coordinates[0][1], //latitude
